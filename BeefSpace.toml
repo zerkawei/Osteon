@@ -1,5 +1,5 @@
 FileVersion = 1
-Projects = {Osteon = {Path = "."}}
+Projects = {Osteon = {Path = "."}, OsteonTest = {Path = "OsteonTest"}}
 
 [Workspace]
-StartupProject = "Osteon"
+StartupProject = "OsteonTest"

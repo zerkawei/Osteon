@@ -1,0 +1,6 @@
+FileVersion = 1
+Dependencies = {corlib = "*", Osteon = "*"}
+
+[Project]
+Name = "OsteonTest"
+StartupObject = "OsteonTest.Program"

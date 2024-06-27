@@ -3,47 +3,64 @@ using System.Numerics;
 namespace Osteon;
 
 [AttributeUsage(.Method, .None)]
-public struct ReduceAttribute : Attribute, IOnMethodInit
+public struct ElementWiseAttribute : Attribute, IOnMethodInit
 {
-	public StringView intrinsic;
-	public StringView op;
-	public this(StringView intrinsic, StringView op)
+	public StringView method;
+	public StringView reducer;
+
+	public this(StringView method ,StringView reducer = "")
 	{
-		this.intrinsic = intrinsic;
-		this.op = op;
+		this.method = method;
+		this.reducer = reducer;
 	}
 
 	[Comptime]
 	public void OnMethodInit(System.Reflection.MethodInfo methodInfo, Self* prev)
 	{
-		let t = methodInfo.DeclaringType.GetMethod(intrinsic, .Static | .NonPublic).Value.ReturnType;
-
 		let s = scope String();
+		s.Append(scope $"return ");
 
-		s.Append(scope $"let val = {intrinsic}(");
-
-		for(let i < methodInfo.ParamCount)
+End:	{
+		StringView topSeparator;
+		if(reducer == "")
 		{
-			if(i > 0) s.Append(", ");
-			s.Append(methodInfo.GetParamName(i));
-		}
+			s.Append(".(");
+			topSeparator = ", ";
 
-		s.Append(");\nreturn ");
+			defer :End s.Append(")");
+		}
+		else { topSeparator = reducer; }
 
 		var first = true;
-		for(let f in t.GetFields(.Public | .Instance))
-		{
-			if(!first)
-			{
-				s.Append(op);
-			}
-			else
-			{
-				first = false;
-			}
-			s.Append(scope $"val.{f.Name}");
-		}
+    	for(let f in methodInfo.DeclaringType.GetFields(.Public | .Instance))
+Loop:	{
+			if(!first) s.Append(topSeparator); else first = false;
 
+			StringView separator;
+			if(method[0].IsLetter || method[0] == '_')
+			{
+				s.Append(method);
+				s.Append("(");
+				separator = ", ";
+
+				defer :Loop s.Append(")");
+			}
+			else { separator = method; }
+
+			for(let p < methodInfo.ParamCount)
+			{
+				if(p > 0 || (separator == method && methodInfo.ParamCount == 1)) s.Append(separator);
+				let t = methodInfo.GetParamType(p);
+				s.Append(methodInfo.GetParamName(p));
+				if(!t.IsPrimitive)
+				{
+					s.Append(".");
+					s.Append(f.Name);
+				}
+			}
+		}
+			
+		}
 		s.Append(";");
 		Compiler.EmitMethodEntry(methodInfo, s);
 	}
@@ -52,92 +69,20 @@ public struct ReduceAttribute : Attribute, IOnMethodInit
 [UnderlyingArray(typeof(float), 2, true)]
 public struct Vec2f
 {
-	public static Self Zero     = .(0);
-	public static Self One      = .(1);
-	public static Self Unit     = .(1,0);
+	public static Self Zero  = .(0);
+	public static Self One   = .(1);
+	public static Self UnitX = .(1,0);
+	public static Self UnitY = .(0,1);
 
 	public float X;
 	public float Y;
 
-	public this(float val)
-	{
-		X = val;
-		Y = val;
-	}
-
-	public this(float x, float y)
-	{
-		X = x;
-		Y = y;
-	}
-
-	public static Self FromAngle(float angle) => .(Math.Cos(angle), Math.Sin(angle));
-
-	[Intrinsic("mul")]
-	private static extern Self mul(Self lhs, Self rhs);
-	[Intrinsic("eq")]
-	private static extern bool2 eq(Self lhs, Self rhs);
-	[Intrinsic("neq")]
-	private static extern bool2 neq(Self lhs, Self rhs);
-	[Intrinsic("lt")]
-	private static extern bool2 lt(Self lhs, Self rhs);
-	[Intrinsic("lte")]
-	private static extern bool2 lte(Self lhs, Self rhs);
-	[Intrinsic("gt")]
-	private static extern bool2 gt(Self lhs, Self rhs);
-	[Intrinsic("gte")]
-	private static extern bool2 gte(Self lhs, Self rhs);
-
-	[Intrinsic("add")]
-	public static extern Self operator+(Self lhs, Self rhs);
-	[Intrinsic("add"), Commutable]
-	public static extern Self operator+(Self lhs, float rhs);
-
-	[Intrinsic("sub")]
-	public static extern Self operator-(Self lhs, Self rhs);
-	[Intrinsic("sub"), Commutable]
-	public static extern Self operator-(Self lhs, float rhs);
-
-	[Intrinsic("mul"), Commutable]
-	public static extern Self operator*(Self lhs, float rhs);
-	[Intrinsic("div"), Commutable]
-	public static extern Self operator/(Self lhs, float rhs);
-
-	[Intrinsic("abs")]
-	public static extern Self Abs(Self val);
-	[Intrinsic("floor")]
-	public static extern Self Floor(Self val);
-	[Intrinsic("round")]
-	public static extern Self Round(Self val);
-
-	[Reduce("eq", "&&")]
-	public static bool operator==(Self lhs, Self rhs){}
-	[Reduce("neq", "&&")]
-	public static bool operator!=(Self lhs, Self rhs){}
-	[Reduce("lt", "&&")]
-	public static bool operator<(Self lhs, Self rhs){}
-	[Reduce("lte", "&&")]
-	public static bool operator<=(Self lhs, Self rhs){}
-	[Reduce("gt", "&&")]
-	public static bool operator>(Self lhs, Self rhs){}
-	[Reduce("gte", "&&")]
-	public static bool operator>=(Self lhs, Self rhs){}
-	[Reduce("mul", "+")]
-	public static float Dot(Self lhs, Self rhs){}
-	public static float Cross(Self lhs, Self rhs) => lhs.X * rhs.Y - lhs.Y * rhs.X;
-
-
 	[Inline]
-	public float Dot(Self rhs)   => Dot(this, rhs);
+	public float Length => Math.Sqrt(Dot(this));
 	[Inline]
-	public float Cross(Self rhs) => Cross(this, rhs);
+	public float LengthSquared => Dot(this);
 	[Inline]
-	public float Length          => Math.Sqrt(Dot(this));
-	[Inline]
-	public float LengthSquared   => Dot(this);
-	[Inline]
-	public float Angle           => Math.Atan2(Y, X);
-
+	public float Angle => Math.Atan2(Y, X);
 	public Self Normalized
 	{
 		get
@@ -147,5 +92,184 @@ public struct Vec2f
 		}
 	}
 
+	public this(float val) : this(val, val) {}
+	public this(float x, float y)
+	{
+		X = x;
+		Y = y;
+	}
+	public static Self FromAngle(float angle) => .(Math.Cos(angle), Math.Sin(angle));
 
+	[Inline]
+	public float Dot(Self rhs) => Dot(this, rhs);
+	[Inline]
+	public float Cross(Self rhs) => Cross(this, rhs);
+	public float Distance(Self rhs) => (this - rhs).Length;
+	public float SquaredDistance(Self rhs) => (this - rhs).LengthSquared;
+
+	public Self Project(Self rhs) => rhs * (Dot(rhs) / rhs.LengthSquared);
+
+	[ElementWise("*", "+")]
+	public static float Dot (Self lhs, Self rhs) {}
+	public static float Cross(Self lhs, Self rhs) => lhs.X * rhs.Y - lhs.Y * rhs.X;
+
+	[ElementWise("Math.Abs")]      public static Self Abs  (Self val) {}
+	[ElementWise("Math.Floor")]    public static Self Floor(Self val) {}
+	[ElementWise("Math.Ceiling")]  public static Self Ceil (Self val) {}
+	[ElementWise("Math.Round")]    public static Self Round(Self val) {}
+	[ElementWise("Math.Sign")]     public static Self Sign (Self val) {}
+	[ElementWise("Math.Clamp")]    public static Self Clamp(Self val, Self min, Self max) {}
+
+	[ElementWise("+")]             public static Self operator+(Self lhs, Self rhs)  {}
+	[ElementWise("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
+	[ElementWise("-")]             public static Self operator-(Self lhs)            {}
+	[ElementWise("-")]             public static Self operator-(Self lhs, Self rhs)  {}
+	[ElementWise("-"), Commutable] public static Self operator-(Self lhs, float rhs) {}
+	[ElementWise("*")]             public static Self operator*(Self lhs, Self rhs)  {}
+	[ElementWise("*"), Commutable] public static Self operator*(Self lhs, float rhs) {}
+	[ElementWise("/")]             public static Self operator/(Self lhs, Self rhs)  {}
+	[ElementWise("/")]             public static Self operator/(Self lhs, float rhs) {}
+	[ElementWise("/")]             public static Self operator/(float lhs, Self rhs) {}
+	[ElementWise("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
+	[ElementWise("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
+}
+
+[UnderlyingArray(typeof(float), 3, true)]
+public struct Vec3f
+{
+	public static Self Zero  = .(0);
+	public static Self One   = .(1);
+	public static Self UnitX = .(1,0,0);
+	public static Self UnitY = .(0,1,0);
+	public static Self UnitZ = .(0,0,1);
+
+	public float X;
+	public float Y;
+	public float Z;
+
+	[Inline]
+	public float Length => Math.Sqrt(Dot(this));
+	[Inline]
+	public float LengthSquared => Dot(this);
+	public Self Normalized
+	{
+		get
+		{
+			let len = LengthSquared;
+			return (len) == 0 ? Zero : this / Math.Sqrt(len);
+		}
+	}
+
+	public this(float val) : this(val, val, val) {}
+	public this(float x, float y, float z)
+	{
+		X = x;
+		Y = y;
+		Z = z;
+	}
+
+	[Inline]
+	public float Dot(Self rhs) => Dot(this, rhs);
+	[Inline]
+	public Self Cross(Self rhs) => Cross(this, rhs);
+	public float Distance(Self rhs) => (this - rhs).Length;
+	public float SquaredDistance(Self rhs) => (this - rhs).LengthSquared;
+
+	public Self Project(Self rhs) => rhs * (Dot(rhs) / rhs.LengthSquared);
+
+	[ElementWise("*", "+")]
+	public static float Dot (Self lhs, Self rhs) {}
+	public static Self Cross(Self lhs, Self rhs) => .(
+		(lhs.Y * rhs.Z) - (lhs.Z * rhs.Y),
+		(lhs.Z * rhs.X) - (lhs.X * rhs.Z),
+		(lhs.X * rhs.Y) - (lhs.Y * rhs.X)
+	);
+
+	[ElementWise("Math.Abs")]      public static Self Abs  (Self val) {}
+	[ElementWise("Math.Floor")]    public static Self Floor(Self val) {}
+	[ElementWise("Math.Ceiling")]  public static Self Ceil (Self val) {}
+	[ElementWise("Math.Round")]    public static Self Round(Self val) {}
+	[ElementWise("Math.Sign")]     public static Self Sign (Self val) {}
+	[ElementWise("Math.Clamp")]    public static Self Clamp(Self val, Self min, Self max) {}
+
+	[ElementWise("+")]             public static Self operator+(Self lhs, Self rhs)  {}
+	[ElementWise("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
+	[ElementWise("-")]             public static Self operator-(Self lhs)            {}
+	[ElementWise("-")]             public static Self operator-(Self lhs, Self rhs)  {}
+	[ElementWise("-"), Commutable] public static Self operator-(Self lhs, float rhs) {}
+	[ElementWise("*")]             public static Self operator*(Self lhs, Self rhs)  {}
+	[ElementWise("*"), Commutable] public static Self operator*(Self lhs, float rhs) {}
+	[ElementWise("/")]             public static Self operator/(Self lhs, Self rhs)  {}
+	[ElementWise("/")]             public static Self operator/(Self lhs, float rhs) {}
+	[ElementWise("/")]             public static Self operator/(float lhs, Self rhs) {}
+	[ElementWise("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
+	[ElementWise("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
+}
+
+[UnderlyingArray(typeof(float), 4, true)]
+public struct Vec4f
+{
+	public static Self Zero  = .(0);
+	public static Self One   = .(1);
+	public static Self UnitX = .(1,0,0,0);
+	public static Self UnitY = .(0,1,0,0);
+	public static Self UnitZ = .(0,0,1,0);
+	public static Self UnitW = .(0,0,0,1);
+
+	public float X;
+	public float Y;
+	public float Z;
+	public float W;
+
+	[Inline]
+	public float Length => Math.Sqrt(Dot(this));
+	[Inline]
+	public float LengthSquared => Dot(this);
+	public Self Normalized
+	{
+		get
+		{
+			let len = LengthSquared;
+			return (len) == 0 ? Zero : this / Math.Sqrt(len);
+		}
+	}
+
+	public this(float val) : this(val, val, val, val) {}
+	public this(float x, float y, float z, float w)
+	{
+		X = x;
+		Y = y;
+		Z = z;
+		W = w;
+	}
+
+	[Inline]
+	public float Dot(Self rhs) => Dot(this, rhs);
+	public float Distance(Self rhs) => (this - rhs).Length;
+	public float SquaredDistance(Self rhs) => (this - rhs).LengthSquared;
+
+	public Self Project(Self rhs) => rhs * (Dot(rhs) / rhs.LengthSquared);
+
+	[ElementWise("*", "+")]
+	public static float Dot (Self lhs, Self rhs) {}
+
+	[ElementWise("Math.Abs")]      public static Self Abs  (Self val) {}
+	[ElementWise("Math.Floor")]    public static Self Floor(Self val) {}
+	[ElementWise("Math.Ceiling")]  public static Self Ceil (Self val) {}
+	[ElementWise("Math.Round")]    public static Self Round(Self val) {}
+	[ElementWise("Math.Sign")]     public static Self Sign (Self val) {}
+	[ElementWise("Math.Clamp")]    public static Self Clamp(Self val, Self min, Self max) {}
+
+	[ElementWise("+")]             public static Self operator+(Self lhs, Self rhs)  {}
+	[ElementWise("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
+	[ElementWise("-")]             public static Self operator-(Self lhs)            {}
+	[ElementWise("-")]             public static Self operator-(Self lhs, Self rhs)  {}
+	[ElementWise("-"), Commutable] public static Self operator-(Self lhs, float rhs) {}
+	[ElementWise("*")]             public static Self operator*(Self lhs, Self rhs)  {}
+	[ElementWise("*"), Commutable] public static Self operator*(Self lhs, float rhs) {}
+	[ElementWise("/")]             public static Self operator/(Self lhs, Self rhs)  {}
+	[ElementWise("/")]             public static Self operator/(Self lhs, float rhs) {}
+	[ElementWise("/")]             public static Self operator/(float lhs, Self rhs) {}
+	[ElementWise("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
+	[ElementWise("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
 }
