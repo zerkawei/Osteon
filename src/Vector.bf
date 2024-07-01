@@ -67,7 +67,7 @@ Loop:	{
 }
 
 [UnderlyingArray(typeof(float), 2, true)]
-public struct Vec2f
+public struct Vector2
 {
 	public static Self Zero  = .(0);
 	public static Self One   = .(1);
@@ -135,7 +135,7 @@ public struct Vec2f
 }
 
 [UnderlyingArray(typeof(float), 3, true)]
-public struct Vec3f
+public struct Vector3
 {
 	public static Self Zero  = .(0);
 	public static Self One   = .(1);
@@ -207,7 +207,7 @@ public struct Vec3f
 }
 
 [UnderlyingArray(typeof(float), 4, true)]
-public struct Vec4f
+public struct Vector4
 {
 	public static Self Zero  = .(0);
 	public static Self One   = .(1);

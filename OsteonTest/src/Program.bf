@@ -6,8 +6,8 @@ class Program
 {
 	public static void Main()
 	{
-		Vec2f a = .(1,2);
-		Vec2f b = .(4,5);
+		Vector2 a = .(1,2);
+		Vector2 b = .(4,5);
 
 		let c = a.Dot(b);
 
