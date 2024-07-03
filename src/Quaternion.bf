@@ -1,7 +1,6 @@
 using System;
 namespace Osteon;
 
-[UnderlyingArray(typeof(float), 4, true)]
 public struct Quaternion
 {
 	public static Self Identity = .(0,0,0,1);

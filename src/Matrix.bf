@@ -64,7 +64,7 @@ Loop:	{
 	}
 }
 
-[Union, UnderlyingArray(typeof(float), 9, true)]
+[Union, Ordered]
 public struct Matrix3
 {
 	public static Self Identity = .(.(.UnitX, .UnitY, .UnitZ));
@@ -98,10 +98,26 @@ public struct Matrix3
 	public this(Vector3[3] columns) { mColumns = columns; }
 	public this(float m11, float m12, float m13, float m21, float m22, float m23, float m31, float m32, float m33)
 	{
-		this = ?;
-		this[0,0] = m11; this[0,1] = m12; this[0,2] = m13;
-		this[1,0] = m21; this[1,1] = m22; this[1,2] = m23;
-		this[2,0] = m31; this[2,1] = m32; this[2,2] = m33;
+		mValues = .(
+			.(m11, m21, m31),
+			.(m12, m22, m32),
+			.(m13, m23, m33)
+			);
+	}
+	public static Self Translation(Vector2 by) =>
+		.(1, 0, by.X,
+		  0, 1, by.Y,
+		  0, 0, 1);
+	public static Self Scale(Vector2 by) =>
+		.(by.X, 0,    0,
+		  0,    by.Y, 0,
+		  0,    0,    1);
+	public static Self Rotation(float by)
+	{
+		let s = Math.Sin(by);
+		let c = Math.Cos(by);
+
+		return .(c, -s, 0, s, c, 0, 0, 0, 1);
 	}
 
 	public static Self operator*(Self a, Self b)
@@ -119,7 +135,7 @@ public struct Matrix3
 			a[1,0] * b.X + a[1,1] * b.Y + a[1,2] * b.Z,
 			a[2,0] * b.X + a[2,1] * b.Y + a[2,2] * b.Z
 		);
-
+	
 	[MatrixOperator<3>("+")]             public static Self operator+ (Self a, Self b)  {}
 	[MatrixOperator<3>("+"), Commutable] public static Self operator+ (Self a, float b) {}
 	[MatrixOperator<3>("-")]             public static Self operator- (Self a, Self b)  {}
@@ -127,9 +143,14 @@ public struct Matrix3
 	[MatrixOperator<3>("*"), Commutable] public static Self operator* (Self a, float b) {}
 	[MatrixOperator<3>("==", "&&")]      public static bool operator==(Self a, Self b)  {}
 	[MatrixOperator<3>("!=", "||")]      public static bool operator!=(Self a, Self b)  {}
+
+	public override void ToString(String strBuffer)
+	{
+		mValues.ToString(strBuffer);
+	} 
 }
 
-[Union, UnderlyingArray(typeof(float), 16, true)]
+[Union, Ordered]
 public struct Matrix4
 {
 	public static Self Identity = .(.(.UnitX, .UnitY, .UnitZ, .UnitW));

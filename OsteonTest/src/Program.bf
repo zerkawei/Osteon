@@ -6,12 +6,12 @@ class Program
 {
 	public static void Main()
 	{
-		Vector2 a = .(1,2);
-		Vector2 b = .(4,5);
+		Vector2 a = .(1,1);
+		let rot = Matrix3.Identity;
+		a = (.)(rot * a);
 
-		let c = a.Dot(b);
-
-		Console.WriteLine(c);
+		Console.WriteLine(rot);
+		Console.WriteLine(a);
 		Console.Read();
 	}
 }

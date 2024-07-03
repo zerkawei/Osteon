@@ -66,7 +66,6 @@ Loop:	{
 	}
 }
 
-[UnderlyingArray(typeof(float), 2, true)]
 public struct Vector2
 {
 	public static Self Zero  = .(0);
@@ -132,9 +131,16 @@ public struct Vector2
 	[VectorOperator("/")]             public static Self operator/(float lhs, Self rhs) {}
 	[VectorOperator("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
 	[VectorOperator("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
+
+	public static implicit operator Vector3(Self vec) => .(vec.X, vec.Y, 1);
+	public static explicit operator Self(Vector3 vec) => .(vec.X, vec.Y);
+
+	public override void ToString(String strBuffer)
+	{
+		strBuffer.Append(scope $"({X},{Y})");
+	}
 }
 
-[UnderlyingArray(typeof(float), 3, true)]
 public struct Vector3
 {
 	public static Self Zero  = .(0);
@@ -204,9 +210,13 @@ public struct Vector3
 	[VectorOperator("/")]             public static Self operator/(float lhs, Self rhs) {}
 	[VectorOperator("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
 	[VectorOperator("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
+
+	public override void ToString(String strBuffer)
+	{
+		strBuffer.Append(scope $"({X},{Y},{Z})");
+	}
 }
 
-[UnderlyingArray(typeof(float), 4, true)]
 public struct Vector4
 {
 	public static Self Zero  = .(0);
@@ -272,4 +282,9 @@ public struct Vector4
 	[VectorOperator("/")]             public static Self operator/(float lhs, Self rhs) {}
 	[VectorOperator("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
 	[VectorOperator("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
+
+	public override void ToString(String strBuffer)
+	{
+		strBuffer.Append(scope $"({X},{Y},{Z},{W})");
+	}
 }
