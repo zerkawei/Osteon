@@ -1,6 +1,69 @@
 using System;		  
 namespace Osteon;
 
+[AttributeUsage(.Method, .None)]
+public struct MatrixOperatorAttribute<T> : Attribute, IOnMethodInit where T : const int
+{
+	public StringView method;
+	public StringView reducer;
+
+	public this(StringView method ,StringView reducer = "")
+	{
+		this.method = method;
+		this.reducer = reducer;
+	}
+
+	[Comptime]
+	public void OnMethodInit(System.Reflection.MethodInfo methodInfo, Self* prev)
+	{
+		let s = scope String();
+		s.Append(scope $"return ");
+
+End:	{
+		StringView topSeparator;
+		if(reducer == "")
+		{
+			s.Append(".(");
+			topSeparator = ", ";
+
+			defer :End s.Append(")");
+		}
+		else { topSeparator = reducer; }
+
+		var first = true;
+    	for(let i < T*T)
+Loop:	{
+			if(!first) s.Append(topSeparator); else first = false;
+
+			StringView separator;
+			if(method[0].IsLetter || method[0] == '_')
+			{
+				s.Append(method);
+				s.Append("(");
+				separator = ", ";
+
+				defer :Loop s.Append(")");
+			}
+			else { separator = method; }
+
+			for(let p < methodInfo.ParamCount)
+			{
+				if(p > 0 || (separator == method && methodInfo.ParamCount == 1)) s.Append(separator);
+				let t = methodInfo.GetParamType(p);
+				s.Append(methodInfo.GetParamName(p));
+				if(!t.IsPrimitive)
+				{
+					s.Append(scope $"[{i%T},{(i%T + i/T)%T}]");
+				}
+			}
+		}
+			
+		}
+		s.Append(";");
+		Compiler.EmitMethodEntry(methodInfo, s);
+	}
+}
+
 [Union, UnderlyingArray(typeof(float), 9, true)]
 public struct Matrix3
 {
@@ -20,6 +83,18 @@ public struct Matrix3
 		[Inline] set mut => mColumns[column] = value;
 	}
 
+	public float Determinant =>
+		this[0,0] * this[1,1] * this[2,2]
+		+ this[0,1] * this[1,2] * this[2,0]
+		+ this[0,2] * this[1,0] * this[1,2]
+		- this[0,2] * this[1,1] * this[2,0]
+		- this[0,1] * this[1,0] * this[2,2]
+		- this[0,0] * this[1,2] * this[2,1];
+	public Matrix3 Transpose =>
+		.(this[0,0], this[1,0], this[2,0],
+		  this[0,1], this[1,1], this[2,1],
+		  this[0,2], this[1,2], this[2,2]);
+
 	public this(Vector3[3] columns) { mColumns = columns; }
 	public this(float m11, float m12, float m13, float m21, float m22, float m23, float m31, float m32, float m33)
 	{
@@ -28,14 +103,6 @@ public struct Matrix3
 		this[1,0] = m21; this[1,1] = m22; this[1,2] = m23;
 		this[2,0] = m31; this[2,1] = m32; this[2,2] = m33;
 	}
-
-	public float Determinant =>
-		this[0,0] * this[1,1] * this[2,2]
-	  + this[0,1] * this[1,2] * this[2,0]
-	  + this[0,2] * this[1,0] * this[1,2]
-	  - this[0,2] * this[1,1] * this[2,0]
-	  - this[0,1] * this[1,0] * this[2,2]
-	  - this[0,0] * this[1,2] * this[2,1];
 
 	public static Self operator*(Self a, Self b)
 	{
@@ -53,14 +120,13 @@ public struct Matrix3
 			a[2,0] * b.X + a[2,1] * b.Y + a[2,2] * b.Z
 		);
 
-	public static bool operator==(Self a, Self b)
-		=> a[0,0] == b[0,0] && a[1,1] == b[1,1] && a[2,2] == b[2,2]
-		&& a[0,1] == b[0,1] && a[1,2] == b[1,2] && a[2,0] == b[2,0]
-		&& a[0,2] == b[0,2] && a[1,0] == b[1,0] && a[2,1] == b[2,1];
-	public static bool operator!=(Self a, Self b)
-		=> a[0,0] != b[0,0] || a[1,1] != b[1,1] || a[2,2] != b[2,2]
-		|| a[0,1] != b[0,1] || a[1,2] != b[1,2] || a[2,0] != b[2,0]
-		|| a[0,2] != b[0,2] || a[1,0] != b[1,0] || a[2,1] != b[2,1];
+	[MatrixOperator<3>("+")]             public static Self operator+ (Self a, Self b)  {}
+	[MatrixOperator<3>("+"), Commutable] public static Self operator+ (Self a, float b) {}
+	[MatrixOperator<3>("-")]             public static Self operator- (Self a, Self b)  {}
+	[MatrixOperator<3>("-"), Commutable] public static Self operator- (Self a, float b) {}
+	[MatrixOperator<3>("*"), Commutable] public static Self operator* (Self a, float b) {}
+	[MatrixOperator<3>("==", "&&")]      public static bool operator==(Self a, Self b)  {}
+	[MatrixOperator<3>("!=", "||")]      public static bool operator!=(Self a, Self b)  {}
 }
 
 [Union, UnderlyingArray(typeof(float), 16, true)]
@@ -80,16 +146,6 @@ public struct Matrix4
 	{
 		[Inline] get     => mColumns[column];
 		[Inline] set mut => mColumns[column] = value;
-	}
-
-	public this(Vector4[4] columns) { mColumns = columns; }
-	public this(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33, float m34, float m41, float m42, float m43, float m44)
-	{
-		this = ?;
-		this[0,0] = m11; this[0,1] = m12; this[0,2] = m13; this[0,3] = m14;
-		this[1,0] = m21; this[1,1] = m22; this[1,2] = m23; this[1,3] = m24;
-		this[2,0] = m31; this[2,1] = m32; this[2,2] = m33; this[2,3] = m34;
-		this[3,0] = m41; this[3,1] = m42; this[3,2] = m43; this[3,3] = m44;
 	}
 
 	public float Determinant
@@ -123,6 +179,21 @@ public struct Matrix4
 				   (m0110 + m0011) * this[2,2] * this[3,3];
 		}
 	}
+	public Matrix4 Transpose =>
+		.(this[0,0], this[1,0], this[2,0], this[3,0],
+		  this[0,1], this[1,1], this[2,1], this[3,1],
+		  this[0,2], this[1,2], this[2,2], this[3,2],
+		  this[0,3], this[1,3], this[2,3], this[3,3]);
+
+	public this(Vector4[4] columns) { mColumns = columns; }
+	public this(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33, float m34, float m41, float m42, float m43, float m44)
+	{
+		this = ?;
+		this[0,0] = m11; this[0,1] = m12; this[0,2] = m13; this[0,3] = m14;
+		this[1,0] = m21; this[1,1] = m22; this[1,2] = m23; this[1,3] = m24;
+		this[2,0] = m31; this[2,1] = m32; this[2,2] = m33; this[2,3] = m34;
+		this[3,0] = m41; this[3,1] = m42; this[3,2] = m43; this[3,3] = m44;
+	}
 
 	public static Self operator*(Self a, Self b)
 	{
@@ -142,14 +213,11 @@ public struct Matrix4
 			a[3,0] * b.X + a[3,1] * b.Y + a[3,2] * b.Z + a[3,3] * b.W
 		);
 
-	public static bool operator==(Self a, Self b)
-		=> a[0,0] == b[0,0] && a[1,1] == b[1,1] && a[2,2] == b[2,2] && a[3,3] == b[3,3]
-		&& a[0,1] == b[0,1] && a[1,2] == b[1,2] && a[2,3] == b[2,3] && a[3,0] == b[3,0]
-		&& a[0,2] == b[0,2] && a[1,3] == b[1,3] && a[2,0] == b[2,0] && a[3,1] == b[3,1]
-		&& a[0,3] == b[0,3] && a[1,0] == b[1,0] && a[2,1] == b[2,1] && a[3,2] == b[3,2];
-	public static bool operator!=(Self a, Self b)
-		=> a[0,0] != b[0,0] || a[1,1] != b[1,1] || a[2,2] != b[2,2] || a[3,3] != b[3,3]
-		|| a[0,1] != b[0,1] || a[1,2] != b[1,2] || a[2,3] != b[2,3] || a[3,0] != b[3,0]
-		|| a[0,2] != b[0,2] || a[1,3] != b[1,3] || a[2,0] != b[2,0] || a[3,1] != b[3,1]
-		|| a[0,3] != b[0,3] || a[1,0] != b[1,0] || a[2,1] != b[2,1] || a[3,2] != b[3,2];
+	[MatrixOperator<4>("+")]             public static Self operator+ (Self a, Self b)  {}
+	[MatrixOperator<4>("+"), Commutable] public static Self operator+ (Self a, float b) {}
+	[MatrixOperator<4>("-")]             public static Self operator- (Self a, Self b)  {}
+	[MatrixOperator<4>("-"), Commutable] public static Self operator- (Self a, float b) {}
+	[MatrixOperator<4>("*"), Commutable] public static Self operator* (Self a, float b) {}
+	[MatrixOperator<4>("==", "&&")]      public static bool operator==(Self a, Self b)  {}
+	[MatrixOperator<4>("!=", "||")]      public static bool operator!=(Self a, Self b)  {}
 }
