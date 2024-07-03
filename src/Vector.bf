@@ -3,7 +3,7 @@ using System.Numerics;
 namespace Osteon;
 
 [AttributeUsage(.Method, .None)]
-public struct ElementWiseAttribute : Attribute, IOnMethodInit
+public struct VectorOperatorAttribute : Attribute, IOnMethodInit
 {
 	public StringView method;
 	public StringView reducer;
@@ -109,29 +109,29 @@ public struct Vector2
 
 	public Self Project(Self rhs) => rhs * (Dot(rhs) / rhs.LengthSquared);
 
-	[ElementWise("*", "+")]
+	[VectorOperator("*", "+")]
 	public static float Dot (Self lhs, Self rhs) {}
 	public static float Cross(Self lhs, Self rhs) => lhs.X * rhs.Y - lhs.Y * rhs.X;
 
-	[ElementWise("Math.Abs")]      public static Self Abs  (Self val) {}
-	[ElementWise("Math.Floor")]    public static Self Floor(Self val) {}
-	[ElementWise("Math.Ceiling")]  public static Self Ceil (Self val) {}
-	[ElementWise("Math.Round")]    public static Self Round(Self val) {}
-	[ElementWise("Math.Sign")]     public static Self Sign (Self val) {}
-	[ElementWise("Math.Clamp")]    public static Self Clamp(Self val, Self min, Self max) {}
+	[VectorOperator("Math.Abs")]      public static Self Abs  (Self val) {}
+	[VectorOperator("Math.Floor")]    public static Self Floor(Self val) {}
+	[VectorOperator("Math.Ceiling")]  public static Self Ceil (Self val) {}
+	[VectorOperator("Math.Round")]    public static Self Round(Self val) {}
+	[VectorOperator("Math.Sign")]     public static Self Sign (Self val) {}
+	[VectorOperator("Math.Clamp")]    public static Self Clamp(Self val, Self min, Self max) {}
 
-	[ElementWise("+")]             public static Self operator+(Self lhs, Self rhs)  {}
-	[ElementWise("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
-	[ElementWise("-")]             public static Self operator-(Self lhs)            {}
-	[ElementWise("-")]             public static Self operator-(Self lhs, Self rhs)  {}
-	[ElementWise("-"), Commutable] public static Self operator-(Self lhs, float rhs) {}
-	[ElementWise("*")]             public static Self operator*(Self lhs, Self rhs)  {}
-	[ElementWise("*"), Commutable] public static Self operator*(Self lhs, float rhs) {}
-	[ElementWise("/")]             public static Self operator/(Self lhs, Self rhs)  {}
-	[ElementWise("/")]             public static Self operator/(Self lhs, float rhs) {}
-	[ElementWise("/")]             public static Self operator/(float lhs, Self rhs) {}
-	[ElementWise("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
-	[ElementWise("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
+	[VectorOperator("+")]             public static Self operator+(Self lhs, Self rhs)  {}
+	[VectorOperator("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
+	[VectorOperator("-")]             public static Self operator-(Self lhs)            {}
+	[VectorOperator("-")]             public static Self operator-(Self lhs, Self rhs)  {}
+	[VectorOperator("-"), Commutable] public static Self operator-(Self lhs, float rhs) {}
+	[VectorOperator("*")]             public static Self operator*(Self lhs, Self rhs)  {}
+	[VectorOperator("*"), Commutable] public static Self operator*(Self lhs, float rhs) {}
+	[VectorOperator("/")]             public static Self operator/(Self lhs, Self rhs)  {}
+	[VectorOperator("/")]             public static Self operator/(Self lhs, float rhs) {}
+	[VectorOperator("/")]             public static Self operator/(float lhs, Self rhs) {}
+	[VectorOperator("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
+	[VectorOperator("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
 }
 
 [UnderlyingArray(typeof(float), 3, true)]
@@ -177,7 +177,7 @@ public struct Vector3
 
 	public Self Project(Self rhs) => rhs * (Dot(rhs) / rhs.LengthSquared);
 
-	[ElementWise("*", "+")]
+	[VectorOperator("*", "+")]
 	public static float Dot (Self lhs, Self rhs) {}
 	public static Self Cross(Self lhs, Self rhs) => .(
 		(lhs.Y * rhs.Z) - (lhs.Z * rhs.Y),
@@ -185,25 +185,25 @@ public struct Vector3
 		(lhs.X * rhs.Y) - (lhs.Y * rhs.X)
 	);
 
-	[ElementWise("Math.Abs")]      public static Self Abs  (Self val) {}
-	[ElementWise("Math.Floor")]    public static Self Floor(Self val) {}
-	[ElementWise("Math.Ceiling")]  public static Self Ceil (Self val) {}
-	[ElementWise("Math.Round")]    public static Self Round(Self val) {}
-	[ElementWise("Math.Sign")]     public static Self Sign (Self val) {}
-	[ElementWise("Math.Clamp")]    public static Self Clamp(Self val, Self min, Self max) {}
+	[VectorOperator("Math.Abs")]      public static Self Abs  (Self val) {}
+	[VectorOperator("Math.Floor")]    public static Self Floor(Self val) {}
+	[VectorOperator("Math.Ceiling")]  public static Self Ceil (Self val) {}
+	[VectorOperator("Math.Round")]    public static Self Round(Self val) {}
+	[VectorOperator("Math.Sign")]     public static Self Sign (Self val) {}
+	[VectorOperator("Math.Clamp")]    public static Self Clamp(Self val, Self min, Self max) {}
 
-	[ElementWise("+")]             public static Self operator+(Self lhs, Self rhs)  {}
-	[ElementWise("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
-	[ElementWise("-")]             public static Self operator-(Self lhs)            {}
-	[ElementWise("-")]             public static Self operator-(Self lhs, Self rhs)  {}
-	[ElementWise("-"), Commutable] public static Self operator-(Self lhs, float rhs) {}
-	[ElementWise("*")]             public static Self operator*(Self lhs, Self rhs)  {}
-	[ElementWise("*"), Commutable] public static Self operator*(Self lhs, float rhs) {}
-	[ElementWise("/")]             public static Self operator/(Self lhs, Self rhs)  {}
-	[ElementWise("/")]             public static Self operator/(Self lhs, float rhs) {}
-	[ElementWise("/")]             public static Self operator/(float lhs, Self rhs) {}
-	[ElementWise("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
-	[ElementWise("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
+	[VectorOperator("+")]             public static Self operator+(Self lhs, Self rhs)  {}
+	[VectorOperator("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
+	[VectorOperator("-")]             public static Self operator-(Self lhs)            {}
+	[VectorOperator("-")]             public static Self operator-(Self lhs, Self rhs)  {}
+	[VectorOperator("-"), Commutable] public static Self operator-(Self lhs, float rhs) {}
+	[VectorOperator("*")]             public static Self operator*(Self lhs, Self rhs)  {}
+	[VectorOperator("*"), Commutable] public static Self operator*(Self lhs, float rhs) {}
+	[VectorOperator("/")]             public static Self operator/(Self lhs, Self rhs)  {}
+	[VectorOperator("/")]             public static Self operator/(Self lhs, float rhs) {}
+	[VectorOperator("/")]             public static Self operator/(float lhs, Self rhs) {}
+	[VectorOperator("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
+	[VectorOperator("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
 }
 
 [UnderlyingArray(typeof(float), 4, true)]
@@ -250,26 +250,26 @@ public struct Vector4
 
 	public Self Project(Self rhs) => rhs * (Dot(rhs) / rhs.LengthSquared);
 
-	[ElementWise("*", "+")]
+	[VectorOperator("*", "+")]
 	public static float Dot (Self lhs, Self rhs) {}
 
-	[ElementWise("Math.Abs")]      public static Self Abs  (Self val) {}
-	[ElementWise("Math.Floor")]    public static Self Floor(Self val) {}
-	[ElementWise("Math.Ceiling")]  public static Self Ceil (Self val) {}
-	[ElementWise("Math.Round")]    public static Self Round(Self val) {}
-	[ElementWise("Math.Sign")]     public static Self Sign (Self val) {}
-	[ElementWise("Math.Clamp")]    public static Self Clamp(Self val, Self min, Self max) {}
+	[VectorOperator("Math.Abs")]      public static Self Abs  (Self val) {}
+	[VectorOperator("Math.Floor")]    public static Self Floor(Self val) {}
+	[VectorOperator("Math.Ceiling")]  public static Self Ceil (Self val) {}
+	[VectorOperator("Math.Round")]    public static Self Round(Self val) {}
+	[VectorOperator("Math.Sign")]     public static Self Sign (Self val) {}
+	[VectorOperator("Math.Clamp")]    public static Self Clamp(Self val, Self min, Self max) {}
 
-	[ElementWise("+")]             public static Self operator+(Self lhs, Self rhs)  {}
-	[ElementWise("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
-	[ElementWise("-")]             public static Self operator-(Self lhs)            {}
-	[ElementWise("-")]             public static Self operator-(Self lhs, Self rhs)  {}
-	[ElementWise("-"), Commutable] public static Self operator-(Self lhs, float rhs) {}
-	[ElementWise("*")]             public static Self operator*(Self lhs, Self rhs)  {}
-	[ElementWise("*"), Commutable] public static Self operator*(Self lhs, float rhs) {}
-	[ElementWise("/")]             public static Self operator/(Self lhs, Self rhs)  {}
-	[ElementWise("/")]             public static Self operator/(Self lhs, float rhs) {}
-	[ElementWise("/")]             public static Self operator/(float lhs, Self rhs) {}
-	[ElementWise("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
-	[ElementWise("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
+	[VectorOperator("+")]             public static Self operator+(Self lhs, Self rhs)  {}
+	[VectorOperator("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
+	[VectorOperator("-")]             public static Self operator-(Self lhs)            {}
+	[VectorOperator("-")]             public static Self operator-(Self lhs, Self rhs)  {}
+	[VectorOperator("-"), Commutable] public static Self operator-(Self lhs, float rhs) {}
+	[VectorOperator("*")]             public static Self operator*(Self lhs, Self rhs)  {}
+	[VectorOperator("*"), Commutable] public static Self operator*(Self lhs, float rhs) {}
+	[VectorOperator("/")]             public static Self operator/(Self lhs, Self rhs)  {}
+	[VectorOperator("/")]             public static Self operator/(Self lhs, float rhs) {}
+	[VectorOperator("/")]             public static Self operator/(float lhs, Self rhs) {}
+	[VectorOperator("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
+	[VectorOperator("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
 }

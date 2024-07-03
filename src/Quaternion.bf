@@ -41,15 +41,15 @@ public struct Quaternion
 
 	public Vector3 Rotate(Vector3 v) => (.)((this * v) * Conjugate);
 
-	[ElementWise("+")]             public static Self operator+(Self lhs, Self rhs)  {}
-	[ElementWise("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
-	[ElementWise("-")]             public static Self operator-(Self lhs)            {}
-	[ElementWise("-")]             public static Self operator-(Self lhs, Self rhs)  {}
-	[ElementWise("-"), Commutable] public static Self operator-(Self lhs, float rhs) {}
-	[ElementWise("*"), Commutable] public static Self operator*(Self lhs, float rhs) {}
-	[ElementWise("/")]             public static Self operator/(Self lhs, float rhs) {}
-	[ElementWise("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
-	[ElementWise("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
+	[VectorOperator("+")]             public static Self operator+(Self lhs, Self rhs)  {}
+	[VectorOperator("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
+	[VectorOperator("-")]             public static Self operator-(Self lhs)            {}
+	[VectorOperator("-")]             public static Self operator-(Self lhs, Self rhs)  {}
+	[VectorOperator("-"), Commutable] public static Self operator-(Self lhs, float rhs) {}
+	[VectorOperator("*"), Commutable] public static Self operator*(Self lhs, float rhs) {}
+	[VectorOperator("/")]             public static Self operator/(Self lhs, float rhs) {}
+	[VectorOperator("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
+	[VectorOperator("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
 
 	public static Self operator*(Self lhs, Self rhs)
 		=> .(
