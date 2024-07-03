@@ -209,11 +209,40 @@ public struct Matrix4
 	public this(Vector4[4] columns) { mColumns = columns; }
 	public this(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33, float m34, float m41, float m42, float m43, float m44)
 	{
-		this = ?;
-		this[0,0] = m11; this[0,1] = m12; this[0,2] = m13; this[0,3] = m14;
-		this[1,0] = m21; this[1,1] = m22; this[1,2] = m23; this[1,3] = m24;
-		this[2,0] = m31; this[2,1] = m32; this[2,2] = m33; this[2,3] = m34;
-		this[3,0] = m41; this[3,1] = m42; this[3,2] = m43; this[3,3] = m44;
+		mValues = .(
+			.(m11, m21, m31, m41),
+			.(m12, m22, m32, m42),
+			.(m13, m23, m33, m43),
+			.(m14, m24, m34, m44)
+			);
+	}
+	public static Self Translation(Vector3 by) =>
+		.(1, 0, 0, by.X,
+		  0, 1, 0, by.Y,
+		  0, 0, 1, by.Z,
+		  0, 0, 0, 1);
+	public static Self Scale(Vector3 by) =>
+		.(by.X, 0,    0,    0,
+		  0,    by.Y, 0,    0,
+		  0,    0,    by.Z, 0,
+		  0,    0,    0,    1);
+	public static Self Rotate(Vector3 axis, float angle)
+	{
+		let s  = Math.Sin(angle) * axis;
+		let c  = Math.Cos(angle);
+		let ic = (1-c)*axis;
+
+		let xx = axis.X * ic.X;
+		let xy = axis.X * ic.Y;
+		let yy = axis.Y * ic.Y;
+		let yz = axis.Y * ic.Z;
+		let zz = axis.Z * ic.Z;
+		let zx = axis.Z * ic.X;
+
+		return .(xx + c,   xy - s.Z, zx + s.Y, 0,
+			     xy + s.Z, yy + c,   yz - s.X, 0,
+				 zx - s.Y, yz + s.X, zz + c,   0,
+			     0,        0,        0,        1);
 	}
 
 	public static Self operator*(Self a, Self b)

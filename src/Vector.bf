@@ -211,6 +211,9 @@ public struct Vector3
 	[VectorOperator("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
 	[VectorOperator("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
 
+	public static implicit operator Vector4(Self vec) => .(vec.X, vec.Y, vec.Z, 1);
+	public static explicit operator Self(Vector4 vec) => .(vec.X, vec.Y, vec.Z);
+
 	public override void ToString(String strBuffer)
 	{
 		strBuffer.Append(scope $"({X},{Y},{Z})");
