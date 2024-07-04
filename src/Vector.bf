@@ -118,6 +118,8 @@ public struct Vector2
 	[VectorOperator("Math.Round")]    public static Self Round(Self val) {}
 	[VectorOperator("Math.Sign")]     public static Self Sign (Self val) {}
 	[VectorOperator("Math.Clamp")]    public static Self Clamp(Self val, Self min, Self max) {}
+	[VectorOperator("Math.Min")]      public static Self Min(Self lhs, Self rhs) {}
+	[VectorOperator("Math.Max")]      public static Self Max(Self lhs, Self rhs) {}
 
 	[VectorOperator("+")]             public static Self operator+(Self lhs, Self rhs)  {}
 	[VectorOperator("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
@@ -131,6 +133,11 @@ public struct Vector2
 	[VectorOperator("/")]             public static Self operator/(float lhs, Self rhs) {}
 	[VectorOperator("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
 	[VectorOperator("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
+
+	[VectorOperator(">", "&&")]       public static bool operator> (Self lhs, Self rhs) {}
+	[VectorOperator(">=", "&&")]      public static bool operator>=(Self lhs, Self rhs) {}
+	[VectorOperator("<", "&&")]       public static bool operator< (Self lhs, Self rhs) {}
+	[VectorOperator("<=", "&&")]      public static bool operator<=(Self lhs, Self rhs) {}
 
 	public static implicit operator Vector3(Self vec) => .(vec.X, vec.Y, 1);
 	public static explicit operator Self(Vector3 vec) => .(vec.X, vec.Y);
@@ -280,6 +287,8 @@ public struct Vector4
 	[VectorOperator("Math.Round")]    public static Self Round(Self val) {}
 	[VectorOperator("Math.Sign")]     public static Self Sign (Self val) {}
 	[VectorOperator("Math.Clamp")]    public static Self Clamp(Self val, Self min, Self max) {}
+	[VectorOperator("Math.Min")]      public static Self Min(Self lhs, Self rhs) {}
+	[VectorOperator("Math.Max")]      public static Self Max(Self lhs, Self rhs) {}
 
 	[VectorOperator("+")]             public static Self operator+(Self lhs, Self rhs)  {}
 	[VectorOperator("+"), Commutable] public static Self operator+(Self lhs, float rhs) {}
@@ -293,6 +302,11 @@ public struct Vector4
 	[VectorOperator("/")]             public static Self operator/(float lhs, Self rhs) {}
 	[VectorOperator("==", "&&")]      public static bool operator==(Self lhs, Self rhs) {}
 	[VectorOperator("!=", "||")]      public static bool operator!=(Self lhs, Self rhs) {}
+
+	[VectorOperator(">", "&&")]       public static bool operator> (Self lhs, Self rhs) {}
+	[VectorOperator(">=", "&&")]      public static bool operator>=(Self lhs, Self rhs) {}
+	[VectorOperator("<", "&&")]       public static bool operator< (Self lhs, Self rhs) {}
+	[VectorOperator("<=", "&&")]      public static bool operator<=(Self lhs, Self rhs) {}
 
 	public override void ToString(String strBuffer)
 	{

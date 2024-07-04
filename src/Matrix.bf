@@ -135,6 +135,11 @@ public struct Matrix3
 			a[1,0] * b.X + a[1,1] * b.Y + a[1,2] * b.Z,
 			a[2,0] * b.X + a[2,1] * b.Y + a[2,2] * b.Z
 		);
+	public static Vector2 operator*(Self a, Vector2 b)
+		=> .(
+			a[0,0] * b.X + a[0,1] * b.Y + a[0,2],
+			a[1,0] * b.X + a[1,1] * b.Y + a[1,2]
+		);
 	
 	[MatrixOperator<3>("+")]             public static Self operator+ (Self a, Self b)  {}
 	[MatrixOperator<3>("+"), Commutable] public static Self operator+ (Self a, float b) {}
@@ -261,6 +266,12 @@ public struct Matrix4
 			a[1,0] * b.X + a[1,1] * b.Y + a[1,2] * b.Z + a[1,3] * b.W,
 			a[2,0] * b.X + a[2,1] * b.Y + a[2,2] * b.Z + a[2,3] * b.W,
 			a[3,0] * b.X + a[3,1] * b.Y + a[3,2] * b.Z + a[3,3] * b.W
+		);
+	public static Vector3 operator*(Self a, Vector3 b)
+		=> .(
+			a[0,0] * b.X + a[0,1] * b.Y + a[0,2] * b.Z + a[0,3],
+			a[1,0] * b.X + a[1,1] * b.Y + a[1,2] * b.Z + a[1,3],
+			a[2,0] * b.X + a[2,1] * b.Y + a[2,2] * b.Z + a[2,3]
 		);
 
 	[MatrixOperator<4>("+")]             public static Self operator+ (Self a, Self b)  {}

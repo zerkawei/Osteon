@@ -42,4 +42,11 @@ public struct AABB
 	public static Self operator+(Self lhs, Vector3 rhs) => .(lhs.Minimum + rhs, lhs.Maximum + rhs);
 	[Commutable]
 	public static Self operator*(Self lhs, float rhs)   => .(lhs.Minimum * rhs, lhs.Maximum * rhs);
+	public static Self operator*(Matrix4 lhs, Self rhs)
+	{
+		let a = lhs * rhs.Minimum;
+		let b = lhs * rhs.Maximum;
+
+		return (a < b) ? .(a, b) : .(b, a);
+	}
 }
