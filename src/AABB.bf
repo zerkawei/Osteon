@@ -32,6 +32,9 @@ public struct AABB
 	public bool Contains(Vector3 pos) => pos >= Minimum && pos <= Maximum;
 	public bool Contains(AABB bb) => bb.Minimum >= Minimum && bb.Maximum <= Maximum;
 
+	public bool         Intersects  (AABB with) => (with.Minimum >= Minimum) ? with.Minimum <= Maximum : Contains(with.Maximum);
+	public Result<AABB> Intersection(AABB with) => Intersects(with) ? AABB(Vector3.Max(Minimum, with.Minimum), Vector3.Min(Maximum, with.Maximum)) : .Err;
+
 	public AABB Merge(AABB with)   => .(Vector3.Min(Minimum, with.Minimum), Vector3.Max(Maximum, with.Maximum));
 	public AABB Expand(Vector3 to) => .(Vector3.Min(Minimum, to),           Vector3.Max(Maximum, to));
 
