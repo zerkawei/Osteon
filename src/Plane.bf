@@ -24,6 +24,7 @@ public struct Plane
 			return .(0,0,0,0);
 		}
 	}
+	public Self Flipped => .(-Normal, -D);
 
 	public this(Vector3 normal, float d = 0)
 	{
@@ -39,4 +40,7 @@ public struct Plane
 
 	public Vector3 Project(Vector3 p)  => p - DistanceTo(p) * Normal;
 	public float DistanceTo(Vector3 p) => (Normal.Dot(p) + D);
+
+	public bool SideOf    (Vector3 p)            => DistanceTo(p) > 0;
+	public bool OnSameSide(Vector3 a, Vector3 b) => SideOf(a) == SideOf(b);
 }
