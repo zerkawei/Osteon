@@ -1,2 +1,2 @@
 # Osteon
- Game focused linear algebra library for Beef
+Osteon is a library providing base structs and methods for 2D and 3D game math. This project is a work in progess but currently implements basic operations on Vectors, Matrices, Quaternions, Bounds (AABB, Rect), Planes and Rays.
