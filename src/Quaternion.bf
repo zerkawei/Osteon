@@ -60,4 +60,23 @@ public struct Quaternion
 
 	public static implicit operator Self(Vector3 v) => .(v.X, v.Y, v.Z, 0);
 	public static explicit operator Vector3(Self q) => .(q.X, q.Y, q.Z);
+
+	public static implicit operator Matrix4(Self q)
+	{
+		let s  = 2f / q.NormSquared;
+		let q2 = (Vector3)q * (Vector3)q;
+		let xy = q.X * q.Y;
+		let zw = q.Z * q.W;
+		let xz = q.X * q.Z;
+		let yw = q.Y * q.W;
+		let yz = q.Y * q.Z;
+		let xw = q.X * q.W;
+
+		return .(
+			1-s*(q2.Y + q2.Z), s*(xy - zw), s*(xz + yw), 0,
+			s*(xy + zw), 1-s*(q2.X + q2.Z), s*(yz - xw), 0,
+			s*(xz - yw), s*(yz + xw), 1-s*(q2.X + q2.Y), 0,
+			0, 0, 0, 1
+			);
+	}
 }
