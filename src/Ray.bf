@@ -10,4 +10,6 @@ public struct Ray
 		Origin    = origin;
 		Direction = direction;
 	}
+
+	public static Self operator*(Matrix4 lhs, Self rhs) => .(lhs * rhs.Origin, lhs * rhs.Direction);
 }
