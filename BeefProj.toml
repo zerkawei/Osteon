@@ -1,0 +1,6 @@
+FileVersion = 1
+
+[Project]
+Name = "Osteon"
+TargetType = "BeefLib"
+StartupObject = "Osteon.Program"
