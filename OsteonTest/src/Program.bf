@@ -16,6 +16,7 @@ public class Program
 
 		Console.WriteLine(Matrix3.Identity.Determinant);
 		Console.WriteLine(Matrix3.Identity * a);
+		Console.WriteLine(Matrix4.Identity * a);
 
 		Console.WriteLine(Matrix4.Identity * Matrix4.Identity);
 		Console.WriteLine(Matrix3.Identity * Matrix3.Identity);

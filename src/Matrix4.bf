@@ -46,6 +46,34 @@ public struct Matrix4
 	*/
 
 	[DisableChecks, Optimize]
+	public static Vector3 operator*(Self a, Vector3 b)
+	{
+#if OSTEON_COLUMN_MAJOR
+		float4 tmp = float4(b.X,b.X,b.X,b.X) * *(float4*)&a.mVals[0]
+			       + float4(b.Y,b.Y,b.Y,b.Y) * *(float4*)&a.mVals[1]
+			       + float4(b.Z,b.Z,b.Z,b.Z) * *(float4*)&a.mVals[2]
+			       + *(float4*)&a.mVals[3];;
+
+		return *(Vector3*)&tmp;
+#else
+		Vector3 res = ?;
+
+		float4 bvec4 = .(b.X,b.Y,b.Z,1f);
+
+		float4 tmp = bvec4 * *(float4*)&a.mVals[0];
+		res.X = tmp.x + tmp.y + tmp.z + tmp.w;
+
+		tmp = bvec4 * *(float4*)&a.mVals[1];
+		res.Y = tmp.x + tmp.y + tmp.z + tmp.w;
+
+		tmp = bvec4 * *(float4*)&a.mVals[2];
+		res.Z = tmp.x + tmp.y + tmp.z + tmp.w;
+
+		return res;
+#endif
+	}
+
+	[DisableChecks, Optimize]
 	public static Vector4 operator*(Self a, Vector4 b)
 	{
 #if OSTEON_COLUMN_MAJOR

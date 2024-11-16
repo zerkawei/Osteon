@@ -45,6 +45,9 @@ public struct Matrix3
 	}
 
 	[DisableChecks, Optimize]
+	public static Vector2 operator*(Self a, Vector2 b) => .(b.X * a[0,0] + b.Y * a[0,1] + a[0,2], b.X * a[1,0] + b.Y * a[1,1] + a[1,2]);
+
+	[DisableChecks, Optimize]
 	public static Vector3 operator*(Self a, Vector3 b)
 	{
 #if OSTEON_COLUMN_MAJOR
