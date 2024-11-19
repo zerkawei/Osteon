@@ -43,15 +43,11 @@ public struct Vector4
 	public static extern Self operator+(Self lhs, Self rhs);
 	[Intrinsic("add"), Commutable]
 	public static extern Self operator+(Self lhs, float rhs);
-	[Intrinsic("add")]
-	public static extern Self operator++(Self lhs);
 
 	[Intrinsic("sub")]
 	public static extern Self operator-(Self lhs, Self rhs);
 	[Intrinsic("sub"), Commutable]
 	public static extern Self operator-(Self lhs, float rhs);
-	[Intrinsic("sub")]
-	public static extern Self operator--(Self lhs);
 
 	[Intrinsic("mul")]
 	public static extern Self operator*(Self lhs, Self rhs);

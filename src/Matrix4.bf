@@ -52,7 +52,7 @@ public struct Matrix4
 		float4 tmp = float4(b.X,b.X,b.X,b.X) * *(float4*)&a.mVals[0]
 			       + float4(b.Y,b.Y,b.Y,b.Y) * *(float4*)&a.mVals[1]
 			       + float4(b.Z,b.Z,b.Z,b.Z) * *(float4*)&a.mVals[2]
-			       + *(float4*)&a.mVals[3];;
+			       + *(float4*)&a.mVals[3];
 
 		return *(Vector3*)&tmp;
 #else
@@ -80,7 +80,7 @@ public struct Matrix4
 		float4 tmp = float4(b.X,b.X,b.X,b.X) * *(float4*)&a.mVals[0]
 			       + float4(b.Y,b.Y,b.Y,b.Y) * *(float4*)&a.mVals[1]
 			       + float4(b.Z,b.Z,b.Z,b.Z) * *(float4*)&a.mVals[2]
-			       + float4(b.W,b.W,b.W,b.W) * *(float4*)&a.mVals[3];;
+			       + float4(b.W,b.W,b.W,b.W) * *(float4*)&a.mVals[3];
 
 		return *(Vector4*)&tmp;
 #else
