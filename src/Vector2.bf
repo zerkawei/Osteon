@@ -61,6 +61,12 @@ public struct Vector2
 	[Intrinsic("div")]
 	public static extern Self operator/(float lhs, Self rhs);
 
+	public static bool operator > (Self lhs, Self rhs) => lhs.X >  rhs.X && lhs.Y >  rhs.Y;
+	public static bool operator >=(Self lhs, Self rhs) => lhs.X >= rhs.X && lhs.Y >= rhs.Y;
+	public static bool operator < (Self lhs, Self rhs) => lhs.X <  rhs.X && lhs.Y <  rhs.Y;
+	public static bool operator <=(Self lhs, Self rhs) => lhs.X <= rhs.X && lhs.Y <= rhs.Y;
+	public static bool operator ==(Self lhs, Self rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y;
+
 	public static explicit operator Vector3(Self vec) => .(vec.X, vec.Y, 1f);
 	public static explicit operator Self(Vector3 vec) => .(vec.X, vec.Y);
 

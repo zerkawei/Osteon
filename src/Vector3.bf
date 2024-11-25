@@ -99,6 +99,12 @@ public struct Vector3
 		return .(res.x, res.y, res.z);
 	}
 
+	public static bool operator > (Self lhs, Self rhs) => lhs.X >  rhs.X && lhs.Y >  rhs.Y && lhs.Z >  rhs.Z;
+	public static bool operator >=(Self lhs, Self rhs) => lhs.X >= rhs.X && lhs.Y >= rhs.Y && lhs.Z >= rhs.Z;
+	public static bool operator < (Self lhs, Self rhs) => lhs.X <  rhs.X && lhs.Y <  rhs.Y && lhs.Z <  rhs.Z;
+	public static bool operator <=(Self lhs, Self rhs) => lhs.X <= rhs.X && lhs.Y <= rhs.Y && lhs.Z <= rhs.Z;
+	public static bool operator ==(Self lhs, Self rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y && lhs.Z == rhs.Z;
+
 	public static explicit operator Vector4(Self vec) => .(vec.X, vec.Y, vec.Z, 1f);
 	public static explicit operator Self(Vector4 vec) => *(Self*)&vec;
 
