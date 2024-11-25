@@ -1,7 +1,8 @@
 using System;
+using System.Numerics;
 namespace Osteon;
 
-[UnderlyingArray(typeof(float), 3, true), Align(16)]
+[UnderlyingArray(typeof(float), 3, true)]
 public struct Vector3
 {
 	public const Self UnitX = .(1,0,0);
@@ -36,27 +37,55 @@ public struct Vector3
 		return c.X + c.Y + c.Z;
 	}
 
-	[Intrinsic("add")]
-	public static extern Self operator+(Self lhs, Self rhs);
-	[Intrinsic("add"), Commutable]
-	public static extern Self operator+(Self lhs, float rhs);
+	public static Self operator+(Self lhs, Self rhs)
+	{
+		float4 res = *(float4*)&lhs + *(float4*)&rhs;
+		return .(res.x, res.y, res.z);
+	}
+	public static Self operator+(Self lhs, float rhs)
+	{
+		float4 res = *(float4*)&lhs + .(rhs,rhs,rhs,rhs);
+		return .(res.x, res.y, res.z);
+	}
 
-	[Intrinsic("sub")]
-	public static extern Self operator-(Self lhs, Self rhs);
-	[Intrinsic("sub"), Commutable]
-	public static extern Self operator-(Self lhs, float rhs);
+	public static Self operator-(Self lhs, Self rhs)
+	{
+		float4 res = *(float4*)&lhs - *(float4*)&rhs;
+		return .(res.x, res.y, res.z);
+	}
+	public static Self operator-(Self lhs, float rhs)
+	{
+		float4 res = *(float4*)&lhs - .(rhs,rhs,rhs,rhs);
+		return .(res.x, res.y, res.z);
+	}
 
-	[Intrinsic("mul")]
-	public static extern Self operator*(Self lhs, Self rhs);
-	[Intrinsic("mul"), Commutable]
-	public static extern Self operator*(Self lhs, float rhs);
+	public static Self operator*(Self lhs, Self rhs)
+	{
+		float4 res = *(float4*)&lhs * *(float4*)&rhs;
+		return .(res.x, res.y, res.z);
+	}
+	[Commutable]
+	public static Self operator*(Self lhs, float rhs)
+	{
+		float4 res = *(float4*)&lhs * .(rhs,rhs,rhs,rhs);
+		return .(res.x, res.y, res.z);
+	}
 
-	[Intrinsic("div")]
-	public static extern Self operator/(Self lhs, Self rhs);
-	[Intrinsic("div")]
-	public static extern Self operator/(Self lhs, float rhs);
-	[Intrinsic("div")]
-	public static extern Self operator/(float lhs, Self rhs);
+	public static Self operator/(Self lhs, Self rhs)
+	{
+		float4 res = *(float4*)&lhs / *(float4*)&rhs;
+		return .(res.x, res.y, res.z);
+	}
+	public static Self operator/(Self lhs, float rhs)
+	{
+		float4 res = *(float4*)&lhs / .(rhs,rhs,rhs,rhs);
+		return .(res.x, res.y, res.z);
+	}
+	public static Self operator/(float lhs, Self rhs)
+	{
+		float4 res = .(lhs,lhs,lhs,lhs) / *(float4*)&rhs;
+		return .(res.x, res.y, res.z);
+	}
 
 	public static explicit operator Vector4(Self vec) => .(vec.X, vec.Y, vec.Z, 1f);
 	public static explicit operator Self(Vector4 vec) => *(Self*)&vec;
