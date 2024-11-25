@@ -37,6 +37,18 @@ public struct Vector3
 		return c.X + c.Y + c.Z;
 	}
 
+	public static Self Max(Self lhs, Self rhs)
+	{
+		float4 res = .max(*(float4*)&lhs, *(float4*)&rhs);
+		return .(res.x, res.y, res.z);
+	}
+
+	public static Self Min(Self lhs, Self rhs)
+	{
+		float4 res = .min(*(float4*)&lhs, *(float4*)&rhs);
+		return .(res.x, res.y, res.z);
+	}
+
 	public static Self operator+(Self lhs, Self rhs)
 	{
 		float4 res = *(float4*)&lhs + *(float4*)&rhs;

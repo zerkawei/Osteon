@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 namespace Osteon;
 
 [UnderlyingArray(typeof(float), 4, true)]
@@ -37,6 +38,18 @@ public struct Vector4
 	{
 		let c = lhs * rhs;
 		return c.X + c.Y + c.Z + c.W;
+	}
+
+	public static Self Max(Self lhs, Self rhs)
+	{
+		let res = float4.max(*(float4*)&lhs, *(float4*)&rhs);
+		return *(Self*)&res;
+	}
+
+	public static Self Min(Self lhs, Self rhs)
+	{
+		float4 res = .min(*(float4*)&lhs, *(float4*)&rhs);
+		return *(Self*)&res;
 	}
 
 	[Intrinsic("add")]

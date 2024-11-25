@@ -36,6 +36,9 @@ public struct Vector2
 	public static Self FromAngle(float angle) => .(Math.Sin(angle), Math.Cos(angle));
 	public float Angle => Math.Atan2(this.Y, this.X);
 
+	public static Self Max(Self lhs, Self rhs) => .(Math.Max(lhs.X, rhs.X), Math.Max(lhs.Y, rhs.Y));
+	public static Self Min(Self lhs, Self rhs) => .(Math.Min(lhs.X, rhs.X), Math.Min(lhs.Y, rhs.Y));
+
 	[Intrinsic("add")]
 	public static extern Self operator+(Self lhs, Self rhs);
 	[Intrinsic("add"), Commutable]
