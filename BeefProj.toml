@@ -4,3 +4,8 @@ FileVersion = 1
 Name = "Osteon"
 TargetType = "BeefLib"
 StartupObject = "Osteon.Program"
+
+[Configs.Release.Linux64]
+OptimizationLevel = "O3"
+VectorizeLoops = true
+VectorizeSLP = true

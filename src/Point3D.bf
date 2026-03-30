@@ -2,29 +2,45 @@ using System;
 using System.Numerics;
 namespace Osteon;
 
-[UnderlyingArray(typeof(int32), 3, true)]
+[Union]
 public struct Point3D
 {
+	public const Self One = .(1);
+	public const Self Zero = .(0);
+
 	public const Self UnitX = .(1,0,0);
 	public const Self UnitY = .(0,1,0);
 	public const Self UnitZ = .(0,0,1);
 
-	public int32 X;
-	public int32 Y;
-	public int32 Z;
-
-	public this(int32 val) : this(val, val, val) {}
-	public this(int32 x, int32 y, int32 z)
+	private int32[3] vals;
+	public struct
 	{
-		X = x;
-		Y = y;
-		Z = z;
+		public int32 X;
+		public int32 Y;
+		public int32 Z;
+	};
+
+	public int32 this[int i]
+	{
+		[Inline] get => vals[i];
+		[Inline] set mut => vals[i] = value;
 	}
 
-	public extern float this[int idx] { [Intrinsic("index")] get; [Intrinsic("index")] set; }
+	[Inline]
+	public this(int32 val) : this(val, val, val) {}
+
+	[Inline]
+	public this(int32 x, int32 y, int32 z)
+	{
+		vals = ?;
+		vals[0] = x;
+		vals[1] = y;
+		vals[2] = z;
+	}
 
 	public float LengthSquared => Dot(this, this);
 	public float Length => Math.Sqrt(Dot(this, this));
+	public Vector3 Normalized => ((.)this)/Length;
 
 	public float DistanceSquared(Self other) => (this - other).LengthSquared;
 	public float Distance(Self other) => (this - other).Length;
@@ -36,58 +52,44 @@ public struct Point3D
 		return c.X + c.Y + c.Z;
 	}
 
-	public static Self operator+(Self lhs, Self rhs)
-	{
-		int32_4 res = *(int32_4*)&lhs + *(int32_4*)&rhs;
-		return .(res.x, res.y, res.z);
-	}
-	public static Self operator+(Self lhs, int32 rhs)
-	{
-		int32_4 res = *(int32_4*)&lhs + .(rhs,rhs,rhs,rhs);
-		return .(res.x, res.y, res.z);
-	}
+	[Inline]
+	public static Self operator+(Self lhs, Self rhs) => (int32_4)lhs + (int32_4)rhs;
+	[Inline, Commutable]
+	public static Self operator+(Self lhs, int32 rhs) => (int32_4)lhs + rhs;
 
-	public static Self operator-(Self lhs, Self rhs)
-	{
-		int32_4 res = *(int32_4*)&lhs - *(int32_4*)&rhs;
-		return .(res.x, res.y, res.z);
-	}
-	public static Self operator-(Self lhs, int32 rhs)
-	{
-		int32_4 res = *(int32_4*)&lhs - .(rhs,rhs,rhs,rhs);
-		return .(res.x, res.y, res.z);
-	}
+	[Inline]
+	public static Self operator-(Self lhs, Self rhs) => (int32_4)lhs - (int32_4)rhs;
+	[Inline]
+	public static Self operator-(Self lhs, int32 rhs) => (int32_4)lhs - rhs;
+	[Inline]
+	public static Self operator-(int32 lhs, Self rhs) => lhs - (int32_4)rhs;
 
-	public static Self operator*(Self lhs, Self rhs)
-	{
-		int32_4 res = *(int32_4*)&lhs * *(int32_4*)&rhs;
-		return .(res.x, res.y, res.z);
-	}
-	[Commutable]
-	public static Self operator*(Self lhs, int32 rhs)
-	{
-		int32_4 res = *(int32_4*)&lhs * .(rhs,rhs,rhs,rhs);
-		return .(res.x, res.y, res.z);
-	}
+	[Inline]
+	public static Self operator*(Self lhs, Self rhs) => (int32_4)lhs * (int32_4)rhs;
+	[Inline, Commutable]
+	public static Self operator*(Self lhs, int32 rhs) => (int32_4)lhs * rhs;
 
-	public static Self operator/(Self lhs, Self rhs)
-	{
-		int32_4 res = *(int32_4*)&lhs / *(int32_4*)&rhs;
-		return .(res.x, res.y, res.z);
-	}
-	public static Self operator/(Self lhs, int32 rhs)
-	{
-		int32_4 res = *(int32_4*)&lhs / .(rhs,rhs,rhs,rhs);
-		return .(res.x, res.y, res.z);
-	}
-	public static Self operator/(int32 lhs, Self rhs)
-	{
-		int32_4 res = .(lhs,lhs,lhs,lhs) / *(int32_4*)&rhs;
-		return .(res.x, res.y, res.z);
-	}
+	[Inline]
+	public static Self operator/(Self lhs, Self rhs) => (int32_4)lhs / (int32_4)rhs;
+	[Inline]
+	public static Self operator/(Self lhs, int32 rhs) => (int32_4)lhs / rhs;
+	[Inline]
+	public static Self operator/(int32 lhs, Self rhs) => lhs / (int32_4)rhs;
 
-	public static explicit operator Vector3(Self vec) => .(vec.X, vec.Y, vec.Z);
-	public static explicit operator Self(Vector3 vec) => .((.)vec.X, (.)vec.Y, (.)vec.Z);
+	public static bool operator > (Self lhs, Self rhs) => lhs.X >  rhs.X && lhs.Y >  rhs.Y && lhs.Z >  rhs.Z;
+	public static bool operator >=(Self lhs, Self rhs) => lhs.X >= rhs.X && lhs.Y >= rhs.Y && lhs.Z >= rhs.Z;
+	public static bool operator < (Self lhs, Self rhs) => lhs.X <  rhs.X && lhs.Y <  rhs.Y && lhs.Z <  rhs.Z;
+	public static bool operator <=(Self lhs, Self rhs) => lhs.X <= rhs.X && lhs.Y <= rhs.Y && lhs.Z <= rhs.Z;
+	public static bool operator ==(Self lhs, Self rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y && lhs.Z == rhs.Z;
+
+	[Inline]
+	public static Self operator implicit(int32_4 vec) => .(vec.x, vec.y, vec.z);
+	[Inline]
+	public static int32_4 operator explicit(Self vec) => .(vec.X, vec.Y, vec.Z, 1);
+	[Inline]
+	public static Self operator implicit(Vector3 vec) => .((.)vec.X, (.)vec.Y, (.)vec.Z);
+	[Inline]
+	public static Vector3 operator explicit(Self vec) => .(vec.X, vec.Y, vec.Z);
 
 	public override void ToString(String strBuffer) => strBuffer.AppendF("[{} {} {}]", X, Y, Z);
 }

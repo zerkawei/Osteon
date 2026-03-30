@@ -2,26 +2,41 @@ using System;
 using System.Numerics;
 namespace Osteon;
 
-[UnderlyingArray(typeof(float), 3, true)]
+[Union]
 public struct Vector3
 {
+	public const Self One = .(1);
+	public const Self Zero = .(0);
+
 	public const Self UnitX = .(1,0,0);
 	public const Self UnitY = .(0,1,0);
 	public const Self UnitZ = .(0,0,1);
 
-	public float X;
-	public float Y;
-	public float Z;
-
-	public this(float val) : this(val, val, val) {}
-	public this(float x, float y, float z)
+	private float[3] vals;
+	public struct
 	{
-		X = x;
-		Y = y;
-		Z = z;
+		public float X;
+		public float Y;
+		public float Z;
+	};
+
+	public float this[int i]
+	{
+		[Inline] get => vals[i];
+		[Inline] set mut => vals[i] = value;
 	}
 
-	public extern float this[int idx] { [Intrinsic("index")] get; [Intrinsic("index")] set; }
+	[Inline]
+	public this(float val) : this(val, val, val) {}
+
+	[Inline]
+	public this(float x, float y, float z)
+	{
+		vals = ?;
+		vals[0] = x;
+		vals[1] = y;
+		vals[2] = z;
+	}
 
 	public float LengthSquared => Dot(this, this);
 	public float Length => Math.Sqrt(Dot(this, this));
@@ -37,67 +52,34 @@ public struct Vector3
 		return c.X + c.Y + c.Z;
 	}
 
-	public static Self Max(Self lhs, Self rhs)
-	{
-		float4 res = .max(*(float4*)&lhs, *(float4*)&rhs);
-		return .(res.x, res.y, res.z);
-	}
+	[Inline]
+	public static Self Max(Self lhs, Self rhs) => float4.max((.)lhs, (.)rhs);
+	[Inline]
+	public static Self Min(Self lhs, Self rhs) => float4.min((.)lhs, (.)rhs);
 
-	public static Self Min(Self lhs, Self rhs)
-	{
-		float4 res = .min(*(float4*)&lhs, *(float4*)&rhs);
-		return .(res.x, res.y, res.z);
-	}
+	[Inline]
+	public static Self operator+(Self lhs, Self rhs) => (float4)lhs + (float4)rhs;
+	[Inline, Commutable]
+	public static Self operator+(Self lhs, float rhs) => (float4)lhs + rhs;
 
-	public static Self operator+(Self lhs, Self rhs)
-	{
-		float4 res = *(float4*)&lhs + *(float4*)&rhs;
-		return .(res.x, res.y, res.z);
-	}
-	public static Self operator+(Self lhs, float rhs)
-	{
-		float4 res = *(float4*)&lhs + .(rhs,rhs,rhs,rhs);
-		return .(res.x, res.y, res.z);
-	}
+	[Inline]
+	public static Self operator-(Self lhs, Self rhs) => (float4)lhs - (float4)rhs;
+	[Inline]
+	public static Self operator-(Self lhs, float rhs) => (float4)lhs - rhs;
+	[Inline]
+	public static Self operator-(float lhs, Self rhs) => lhs - (float4)rhs;
 
-	public static Self operator-(Self lhs, Self rhs)
-	{
-		float4 res = *(float4*)&lhs - *(float4*)&rhs;
-		return .(res.x, res.y, res.z);
-	}
-	public static Self operator-(Self lhs, float rhs)
-	{
-		float4 res = *(float4*)&lhs - .(rhs,rhs,rhs,rhs);
-		return .(res.x, res.y, res.z);
-	}
+	[Inline]
+	public static Self operator*(Self lhs, Self rhs) => (float4)lhs * (float4)rhs;
+	[Inline, Commutable]
+	public static Self operator*(Self lhs, float rhs) => (float4)lhs * rhs;
 
-	public static Self operator*(Self lhs, Self rhs)
-	{
-		float4 res = *(float4*)&lhs * *(float4*)&rhs;
-		return .(res.x, res.y, res.z);
-	}
-	[Commutable]
-	public static Self operator*(Self lhs, float rhs)
-	{
-		float4 res = *(float4*)&lhs * .(rhs,rhs,rhs,rhs);
-		return .(res.x, res.y, res.z);
-	}
-
-	public static Self operator/(Self lhs, Self rhs)
-	{
-		float4 res = *(float4*)&lhs / *(float4*)&rhs;
-		return .(res.x, res.y, res.z);
-	}
-	public static Self operator/(Self lhs, float rhs)
-	{
-		float4 res = *(float4*)&lhs / .(rhs,rhs,rhs,rhs);
-		return .(res.x, res.y, res.z);
-	}
-	public static Self operator/(float lhs, Self rhs)
-	{
-		float4 res = .(lhs,lhs,lhs,lhs) / *(float4*)&rhs;
-		return .(res.x, res.y, res.z);
-	}
+	[Inline]
+	public static Self operator/(Self lhs, Self rhs) => (float4)lhs / (float4)rhs;
+	[Inline]
+	public static Self operator/(Self lhs, float rhs) => (float4)lhs / rhs;
+	[Inline]
+	public static Self operator/(float lhs, Self rhs) => lhs / (float4)rhs;
 
 	public static bool operator > (Self lhs, Self rhs) => lhs.X >  rhs.X && lhs.Y >  rhs.Y && lhs.Z >  rhs.Z;
 	public static bool operator >=(Self lhs, Self rhs) => lhs.X >= rhs.X && lhs.Y >= rhs.Y && lhs.Z >= rhs.Z;
@@ -105,8 +87,14 @@ public struct Vector3
 	public static bool operator <=(Self lhs, Self rhs) => lhs.X <= rhs.X && lhs.Y <= rhs.Y && lhs.Z <= rhs.Z;
 	public static bool operator ==(Self lhs, Self rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y && lhs.Z == rhs.Z;
 
-	public static explicit operator Vector4(Self vec) => .(vec.X, vec.Y, vec.Z, 1f);
-	public static explicit operator Self(Vector4 vec) => *(Self*)&vec;
+	[Inline]
+	public static Self operator implicit(float4 vec) => .(vec.x, vec.y, vec.z);
+	[Inline]
+	public static float4 operator explicit(Self vec) => .(vec.X, vec.Y, vec.Z, 1f);
+	[Inline]
+	public static Self operator implicit(Vector4 vec) => .(vec.X, vec.Y, vec.Z);
+	[Inline]
+	public static Vector4 operator explicit(Self vec) => .(vec.X, vec.Y, vec.Z, 1f);
 
 	public override void ToString(String strBuffer) => strBuffer.AppendF("[{} {} {}]", X, Y, Z);
 }

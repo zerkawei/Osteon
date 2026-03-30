@@ -1,26 +1,45 @@
 using System;
+using System.Numerics;
 namespace Osteon;
 
-[UnderlyingArray(typeof(int32), 2, true)]
+[Union]
 public struct Point2D
 {
+	public const Self One = .(1);
+	public const Self Zero = .(0);
+
 	public const Self UnitX = .(1,0);
 	public const Self UnitY = .(0,1);
 
-	public int32 X;
-	public int32 Y;
-
-	public this(int32 val) : this(val, val) {}
-	public this(int32 x, int32 y)
+	private int32[2] vals;
+	public struct
 	{
-		 X = x;
-		 Y = y;
+		public int32 X;
+		public int32 Y;
+	};
+
+	public int32 this[int i]
+	{
+		[Inline] get => vals[i];
+		[Inline] set mut => vals[i] = value;
 	}
 
-	public extern float this[int idx] { [Intrinsic("index")] get; [Intrinsic("index")] set; }
+	[Inline]
+	public this(int32 val) : this(val, val) {}
+
+	[Inline]
+	public this(int32 x, int32 y)
+	{
+		vals = ?;
+		vals[0] = x;
+		vals[1] = y;
+	}
+
+	public float Angle => Math.Atan2(this.Y, this.X);
 
 	public float LengthSquared => Dot(this, this);
 	public float Length => Math.Sqrt(Dot(this, this));
+	public Vector2 Normalized => ((.)this)/Length;
 
 	public float DistanceSquared(Self other) => (this - other).LengthSquared;
 	public float Distance(Self other) => (this - other).Length;
@@ -32,32 +51,44 @@ public struct Point2D
 		return c.X + c.Y;
 	}
 
-	public float Angle => Math.Atan2(this.Y, this.X);
+	[Inline]
+	public static Self operator+(Self lhs, Self rhs) => .(lhs.X + rhs.X, lhs.Y + rhs.Y);
+	[Inline, Commutable]
+	public static Self operator+(Self lhs, int32 rhs) => .(lhs.X + rhs, lhs.Y + rhs);
 
-	[Intrinsic("add")]
-	public static extern Self operator+(Self lhs, Self rhs);
-	[Intrinsic("add"), Commutable]
-	public static extern Self operator+(Self lhs, int32 rhs);
+	[Inline]
+	public static Self operator-(Self lhs, Self rhs) => .(lhs.X - rhs.X, lhs.Y - rhs.Y);
+	[Inline]
+	public static Self operator-(Self lhs, int32 rhs) => .(lhs.X - rhs, lhs.Y - rhs);
+	[Inline]
+	public static Self operator-(int32 lhs, Self rhs) => .(lhs - rhs.X, lhs - rhs.Y);
 
-	[Intrinsic("sub")]
-	public static extern Self operator-(Self lhs, Self rhs);
-	[Intrinsic("sub"), Commutable]
-	public static extern Self operator-(Self lhs, int32 rhs);
+	[Inline]
+	public static Self operator*(Self lhs, Self rhs) => .(lhs.X * rhs.X, lhs.Y * rhs.Y);
+	[Inline, Commutable]
+	public static Self operator*(Self lhs, int32 rhs) => .(lhs.X * rhs, lhs.Y * rhs);
 
-	[Intrinsic("mul")]
-	public static extern Self operator*(Self lhs, Self rhs);
-	[Intrinsic("mul"), Commutable]
-	public static extern Self operator*(Self lhs, int32 rhs);
+	[Inline]
+	public static Self operator/(Self lhs, Self rhs) => .(lhs.X / rhs.X, lhs.Y + rhs.Y);
+	[Inline]
+	public static Self operator/(Self lhs, int32 rhs) => .(lhs.X / rhs, lhs.Y / rhs);
+	[Inline]
+	public static Self operator/(int32 lhs, Self rhs) => .(lhs / rhs.X, lhs / rhs.Y);
 
-	[Intrinsic("div")]
-	public static extern Self operator/(Self lhs, Self rhs);
-	[Intrinsic("div")]
-	public static extern Self operator/(Self lhs, int32 rhs);
-	[Intrinsic("div")]
-	public static extern Self operator/(int32 lhs, Self rhs);
+	public static bool operator > (Self lhs, Self rhs) => lhs.X >  rhs.X && lhs.Y >  rhs.Y;
+	public static bool operator >=(Self lhs, Self rhs) => lhs.X >= rhs.X && lhs.Y >= rhs.Y;
+	public static bool operator < (Self lhs, Self rhs) => lhs.X <  rhs.X && lhs.Y <  rhs.Y;
+	public static bool operator <=(Self lhs, Self rhs) => lhs.X <= rhs.X && lhs.Y <= rhs.Y;
+	public static bool operator ==(Self lhs, Self rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y;
 
-	public static explicit operator Vector2(Self vec) => .(vec.X, vec.Y);
-	public static explicit operator Self(Vector2 vec) => .((.)vec.X, (.)vec.Y);
+	[Inline]
+	public static Self operator implicit(Vector2 vec) => .((.)vec.X, (.)vec.Y);
+	[Inline]
+	public static Vector2 operator explicit(Self vec) => .(vec.X, vec.Y);
+	[Inline]
+	public static Self operator implicit(Point3D vec) => .(vec.X, vec.Y);
+	[Inline]
+	public static Point3D operator explicit(Self vec) => .(vec.X, vec.Y, 1);
 
 	public override void ToString(String strBuffer) => strBuffer.AppendF("[{} {}]", X, Y);
 }

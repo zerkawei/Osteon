@@ -1,5 +1,11 @@
 FileVersion = 1
-Projects = {Osteon = {Path = "."}, OsteonTest = {Path = "OsteonTest"}}
 
 [Workspace]
 StartupProject = "OsteonTest"
+
+[Projects]
+Osteon = {Path = "."}
+OsteonTest = {Path = "OsteonTest"}
+
+[Configs.Release.Linux64]
+IntermediateType = "ObjectAndIRCode"
