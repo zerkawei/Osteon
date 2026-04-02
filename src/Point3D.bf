@@ -38,14 +38,21 @@ public struct Point3D
 		vals[2] = z;
 	}
 
+	[Inline]
 	public float LengthSquared => Dot(this, this);
+	[Inline]
 	public float Length => Math.Sqrt(Dot(this, this));
+	[Inline]
 	public Vector3 Normalized => ((.)this)/Length;
 
+	[Inline]
 	public float DistanceSquared(Self other) => (this - other).LengthSquared;
+	[Inline]
 	public float Distance(Self other) => (this - other).Length;
 
+	[Inline]
 	public float Dot(Self other) => Dot(this, other);
+	[Inline]
 	public static float Dot(Self lhs, Self rhs)
 	{
 		let c = lhs * rhs;
