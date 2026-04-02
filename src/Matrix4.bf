@@ -49,24 +49,22 @@ public struct Matrix4
 	public static Vector3 operator*(Self a, Vector3 b)
 	{
 #if OSTEON_COLUMN_MAJOR
-		float4 tmp = float4(b.X,b.X,b.X,b.X) * *(float4*)&a.mVals[0]
-			       + float4(b.Y,b.Y,b.Y,b.Y) * *(float4*)&a.mVals[1]
-			       + float4(b.Z,b.Z,b.Z,b.Z) * *(float4*)&a.mVals[2]
-			       + *(float4*)&a.mVals[3];
-
-		return *(Vector3*)&tmp;
+		return float4(b.X,b.X,b.X,b.X) * a.mVals[0]
+	       + float4(b.Y,b.Y,b.Y,b.Y) * a.mVals[1]
+	       + float4(b.Z,b.Z,b.Z,b.Z) * a.mVals[2]
+	       + a.mVals[3];
 #else
 		Vector3 res = ?;
 
-		float4 bvec4 = .(b.X,b.Y,b.Z,1f);
+		float4 bvec4 = (.)b;
 
-		float4 tmp = bvec4 * *(float4*)&a.mVals[0];
+		float4 tmp = bvec4 * a.mVals[0];
 		res.X = tmp.x + tmp.y + tmp.z + tmp.w;
 
-		tmp = bvec4 * *(float4*)&a.mVals[1];
+		tmp = bvec4 * a.mVals[1];
 		res.Y = tmp.x + tmp.y + tmp.z + tmp.w;
 
-		tmp = bvec4 * *(float4*)&a.mVals[2];
+		tmp = bvec4 * a.mVals[2];
 		res.Z = tmp.x + tmp.y + tmp.z + tmp.w;
 
 		return res;
@@ -77,25 +75,23 @@ public struct Matrix4
 	public static Vector4 operator*(Self a, Vector4 b)
 	{
 #if OSTEON_COLUMN_MAJOR
-		float4 tmp = float4(b.X,b.X,b.X,b.X) * *(float4*)&a.mVals[0]
-			       + float4(b.Y,b.Y,b.Y,b.Y) * *(float4*)&a.mVals[1]
-			       + float4(b.Z,b.Z,b.Z,b.Z) * *(float4*)&a.mVals[2]
-			       + float4(b.W,b.W,b.W,b.W) * *(float4*)&a.mVals[3];
-
-		return *(Vector4*)&tmp;
+		return float4(b.X,b.X,b.X,b.X) * a.mVals[0]
+	       + float4(b.Y,b.Y,b.Y,b.Y) * a.mVals[1]
+	       + float4(b.Z,b.Z,b.Z,b.Z) * a.mVals[2]
+	       + float4(b.W,b.W,b.W,b.W) * a.mVals[3];
 #else
 		Vector4 res = ?;
 
-		float4 tmp = *(float4*)&b * *(float4*)&a.mVals[0];
+		float4 tmp = (.)b * a.mVals[0];
 		res.X = tmp.x + tmp.y + tmp.z + tmp.w;
 
-		tmp = *(float4*)&b * *(float4*)&a.mVals[1];
+		tmp = (.)b * a.mVals[1];
 		res.Y = tmp.x + tmp.y + tmp.z + tmp.w;
 
-		tmp = *(float4*)&b * *(float4*)&a.mVals[2];
+		tmp = (.)b * a.mVals[2];
 		res.Z = tmp.x + tmp.y + tmp.z + tmp.w;
 
-		tmp = *(float4*)&b * *(float4*)&a.mVals[3];
+		tmp = (.)b * a.mVals[3];
 		res.W = tmp.x + tmp.y + tmp.z + tmp.w;
 		return res;
 #endif
@@ -108,20 +104,20 @@ public struct Matrix4
 #if OSTEON_COLUMN_MAJOR
 		for(let i < 4)
 		{
-			float4 col = .(b[0,i],b[0,i],b[0,i],b[0,i]) * [Inline]BitConverter.Convert<?,float4>(a.mVals[0])
-					   + .(b[1,i],b[1,i],b[1,i],b[1,i]) * [Inline]BitConverter.Convert<?,float4>(a.mVals[1])
-					   + .(b[2,i],b[2,i],b[2,i],b[2,i]) * [Inline]BitConverter.Convert<?,float4>(a.mVals[2])
-					   + .(b[3,i],b[3,i],b[3,i],b[3,i]) * [Inline]BitConverter.Convert<?,float4>(a.mVals[3]);
+			float4 col = .(b[0,i],b[0,i],b[0,i],b[0,i]) * a.mVals[0]
+					   + .(b[1,i],b[1,i],b[1,i],b[1,i]) * a.mVals[1]
+					   + .(b[2,i],b[2,i],b[2,i],b[2,i]) * a.mVals[2]
+					   + .(b[3,i],b[3,i],b[3,i],b[3,i]) * a.mVals[3];
 			res.mVals[i] = *(float[4]*)&col;
 		}
 		return res;
 #else
 		for(let i < 4)
 		{
-			float4 row = .(a[i,0],a[i,0],a[i,0],a[i,0]) * [Inline]BitConverter.Convert<?,float4>(b.mVals[0])
-					   + .(a[i,1],a[i,1],a[i,1],a[i,1]) * [Inline]BitConverter.Convert<?,float4>(b.mVals[1])
-					   + .(a[i,2],a[i,2],a[i,2],a[i,2]) * [Inline]BitConverter.Convert<?,float4>(b.mVals[2])
-					   + .(a[i,3],a[i,3],a[i,3],a[i,3]) * [Inline]BitConverter.Convert<?,float4>(b.mVals[3]);
+			float4 row = .(a[i,0],a[i,0],a[i,0],a[i,0]) * b.mVals[0]
+					   + .(a[i,1],a[i,1],a[i,1],a[i,1]) * b.mVals[1]
+					   + .(a[i,2],a[i,2],a[i,2],a[i,2]) * b.mVals[2]
+					   + .(a[i,3],a[i,3],a[i,3],a[i,3]) * b.mVals[3];
 			res.mVals[i] = *(float[4]*)&row;
 		}
 		return res;

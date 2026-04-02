@@ -63,8 +63,8 @@ public struct Transform2D
 #else
 		for(let i < 2)
 		{
-			float4 row = .(a[i,0],a[i,0],a[i,0],a[i,0]) * *(float4*)&b.mVals[0]
-					   + .(a[i,1],a[i,1],a[i,1],a[i,1]) * *(float4*)&b.mVals[1];
+			float4 row = .(a[i,0],a[i,0],a[i,0],a[i,0]) * b.mVals[0]
+					   + .(a[i,1],a[i,1],a[i,1],a[i,1]) * b.mVals[1];
 			res.mVals[i] = .(row.x, row.y, row.z + a[i,2]);
 		}
 #endif

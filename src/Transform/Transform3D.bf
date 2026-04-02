@@ -77,22 +77,20 @@ public struct Transform3D
 	public static Vector3 operator*(Self a, Vector3 b)
 	{
 #if OSTEON_COLUMN_MAJOR
-		float4 tmp = float4(b.X,b.X,b.X,b.X) * *(float4*)&a.mVals[0]
-			       + float4(b.Y,b.Y,b.Y,b.Y) * *(float4*)&a.mVals[1]
-			       + float4(b.Z,b.Z,b.Z,b.Z) * *(float4*)&a.mVals[2]
-				   + (float4*)&a.mVals[3];
-
-		return *(Vector3*)&tmp;
+		return float4(b.X,b.X,b.X,b.X) * a.mVals[0]
+	       + float4(b.Y,b.Y,b.Y,b.Y) * a.mVals[1]
+	       + float4(b.Z,b.Z,b.Z,b.Z) * a.mVals[2]
+		   + a.mVals[3];
 #else
 		Vector3 res = ?;
 
-		float4 tmp = .(b.X,b.Y,b.Z,1) * *(float4*)&a.mVals[0];
+		float4 tmp = .(b.X,b.Y,b.Z,1) * a.mVals[0];
 		res.X = tmp.x + tmp.y + tmp.z + tmp.w;
 
-		tmp = .(b.X,b.Y,b.Z,1) * *(float4*)&a.mVals[1];
+		tmp = .(b.X,b.Y,b.Z,1) * a.mVals[1];
 		res.Y = tmp.x + tmp.y + tmp.z + tmp.w;
 
-		tmp = .(b.X,b.Y,b.Z,1) * *(float4*)&a.mVals[2];
+		tmp = .(b.X,b.Y,b.Z,1) * a.mVals[2];
 		res.Z = tmp.x + tmp.y + tmp.z + tmp.w;
 		return res;
 #endif
@@ -108,16 +106,16 @@ public struct Transform3D
 			float4 col = .(b[0,i],b[0,i],b[0,i],b[0,i]) * [Inline]BitConverter.Convert<?,float4>(a.mVals[0])
 					   + .(b[1,i],b[1,i],b[1,i],b[1,i]) * [Inline]BitConverter.Convert<?,float4>(a.mVals[1])
 					   + .(b[2,i],b[2,i],b[2,i],b[2,i]) * [Inline]BitConverter.Convert<?,float4>(a.mVals[2]);
-			if(i == 3) col += [Inline]BitConverter.Convert<?,float4>(a.mVals[3]);
+			if(i == 3) col += a.mVals[3]
 			res.mVals[i] = *(float[4]*)&col;
 		}
 		return res;
 #else
 		for(let i < 3)
 		{
-			float4 row = .(a[i,0],a[i,0],a[i,0],a[i,0]) * *(float4*)&b.mVals[0]
-					   + .(a[i,1],a[i,1],a[i,1],a[i,1]) * *(float4*)&b.mVals[1]
-					   + .(a[i,2],a[i,2],a[i,2],a[i,2]) * *(float4*)&b.mVals[2];
+			float4 row = .(a[i,0],a[i,0],a[i,0],a[i,0]) * b.mVals[0]
+					   + .(a[i,1],a[i,1],a[i,1],a[i,1]) * b.mVals[1]
+					   + .(a[i,2],a[i,2],a[i,2],a[i,2]) * b.mVals[2];
 			res.mVals[i] = .(row.x, row.y, row.z, row.w + a[i,3]);
 		}
 #endif

@@ -51,21 +51,19 @@ public struct Matrix3
 	public static Vector3 operator*(Self a, Vector3 b)
 	{
 #if OSTEON_COLUMN_MAJOR
-		float4 tmp = float4(b.X,b.X,b.X,b.X) * *(float4*)&a.mVals[0]
-			       + float4(b.Y,b.Y,b.Y,b.Y) * *(float4*)&a.mVals[1]
-			       + float4(b.Z,b.Z,b.Z,b.Z) * *(float4*)&a.mVals[2];
-
-		return *(Vector3*)&tmp;
+		return float4(b.X,b.X,b.X,b.X) * a.mVals[0]
+	       + float4(b.Y,b.Y,b.Y,b.Y) * a.mVals[1]
+	       + float4(b.Z,b.Z,b.Z,b.Z) * a.mVals[2];
 #else
 		Vector3 res = ?;
 
-		float4 tmp = *(float4*)&b * *(float4*)&a.mVals[0];
+		float4 tmp = (.)b * a.mVals[0];
 		res.X = tmp.x + tmp.y + tmp.z;
 
-		tmp = *(float4*)&b * *(float4*)&a.mVals[1];
+		tmp = (.)b * a.mVals[1];
 		res.Y = tmp.x + tmp.y + tmp.z;
 
-		tmp = *(float4*)&b * *(float4*)&a.mVals[2];
+		tmp = (.)b * a.mVals[2];
 		res.Z = tmp.x + tmp.y + tmp.z;
 		return res;
 #endif
@@ -78,18 +76,18 @@ public struct Matrix3
 #if OSTEON_COLUMN_MAJOR
 		for(let i < 3)
 		{
-			float4 col = .(b[0,i],b[0,i],b[0,i],b[0,i]) * *(float4*)&a.mVals[0]
-					   + .(b[1,i],b[1,i],b[1,i],b[1,i]) * *(float4*)&a.mVals[1]
-					   + .(b[2,i],b[2,i],b[2,i],b[2,i]) * *(float4*)&a.mVals[2];
+			float4 col = .(b[0,i],b[0,i],b[0,i],b[0,i]) * a.mVals[0]
+					   + .(b[1,i],b[1,i],b[1,i],b[1,i]) * a.mVals[1]
+					   + .(b[2,i],b[2,i],b[2,i],b[2,i]) * a.mVals[2];
 			res.mVals[i] = .(col.x, col.y, col.z);
 		}
 		return res;
 #else
 		for(let i < 3)
 		{
-			float4 row = .(a[i,0],a[i,0],a[i,0],a[i,0]) * *(float4*)&b.mVals[0]
-					   + .(a[i,1],a[i,1],a[i,1],a[i,1]) * *(float4*)&b.mVals[1]
-					   + .(a[i,2],a[i,2],a[i,2],a[i,2]) * *(float4*)&b.mVals[2];
+			float4 row = .(a[i,0],a[i,0],a[i,0],a[i,0]) * b.mVals[0]
+					   + .(a[i,1],a[i,1],a[i,1],a[i,1]) * b.mVals[1]
+					   + .(a[i,2],a[i,2],a[i,2],a[i,2]) * b.mVals[2];
 			res.mVals[i] = .(row.x, row.y, row.z);
 		}
 		return res;
