@@ -60,6 +60,17 @@ public struct Vector3
 	}
 
 	[Inline]
+	public Self Cross(Self other) => Cross(this, other);
+	[Inline]
+	public static Self Cross(Self lhs, Self rhs)
+	{
+		let a = rhs * .(lhs.Z, lhs.X, lhs.Y);
+		let b = lhs * .(rhs.Z, rhs.X, rhs.Y);
+		let c = a - b;
+		return .(c.Z, c.X, c.Y);
+	}
+
+	[Inline]
 	public static Self Max(Self lhs, Self rhs) => float4.max((.)lhs, (.)rhs);
 	[Inline]
 	public static Self Min(Self lhs, Self rhs) => float4.min((.)lhs, (.)rhs);

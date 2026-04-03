@@ -25,6 +25,9 @@ public class Program
 		Console.WriteLine(a.LengthSquared);
 		Console.WriteLine(c);
 		Console.WriteLine(d);
+
+		Console.WriteLine(Vector3.UnitX.Cross(.UnitY));
+
 		Console.Read();
 	} 
 }

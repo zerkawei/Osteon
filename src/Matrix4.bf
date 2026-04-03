@@ -31,21 +31,31 @@ public struct Matrix4
 #endif
 	}
 
-	[DisableChecks, Optimize]
 	public Self Transpose => .(this[0,0], this[1,0], this[2,0], this[3,0], this[0,1], this[1,1], this[2,1], this[3,1], this[0,2], this[1,2], this[2,2], this[3,2], this[0,3], this[1,3], this[2,3], this[3,3]);
 
-	/* TODO
+
 	public float Determinant
 	{
-
-		[DisableChecks, Optimize]
 		get
 		{
+			return this[0,0] * (this[1,1] * (this[2,2] * this[3,3] - this[2,3] * this[3,2])
+			                  - this[1,2] * (this[2,1] * this[3,3] - this[2,3] * this[3,1])
+			                  + this[1,3] * (this[2,1] * this[3,2] - this[2,2] * this[3,1]))
+
+			     - this[0,1] * (this[1,0] * (this[2,2] * this[3,3] - this[2,3] * this[3,2])
+			                  - this[1,2] * (this[2,0] * this[3,3] - this[2,3] * this[3,0])
+			                  + this[1,3] * (this[2,0] * this[3,2] - this[2,2] * this[3,0]))
+			
+			     + this[0,2] * (this[1,0] * (this[2,1] * this[3,3] - this[2,3] * this[3,1])
+			                  - this[1,1] * (this[2,0] * this[3,3] - this[2,3] * this[3,0])
+			                  + this[1,3] * (this[2,0] * this[3,1] - this[2,1] * this[3,0]))
+			
+		         - this[0,3] * (this[1,0] * (this[2,1] * this[3,2] - this[2,2] * this[3,1])
+		                      - this[1,1] * (this[2,0] * this[3,2] - this[2,2] * this[3,0])
+		                      + this[1,2] * (this[2,0] * this[3,1] - this[2,1] * this[3,0]));
 		}
 	}
-	*/
 
-	[DisableChecks, Optimize]
 	public static Vector3 operator*(Self a, Vector3 b)
 	{
 #if OSTEON_COLUMN_MAJOR
@@ -71,7 +81,6 @@ public struct Matrix4
 #endif
 	}
 
-	[DisableChecks, Optimize]
 	public static Vector4 operator*(Self a, Vector4 b)
 	{
 #if OSTEON_COLUMN_MAJOR
@@ -97,7 +106,6 @@ public struct Matrix4
 #endif
 	}
 
-	[DisableChecks, Optimize]
 	public static Self operator*(Self a, Self b)
 	{
 		Self res = ?;

@@ -30,12 +30,10 @@ public struct Matrix3
 #endif
 	}
 
-	[DisableChecks, Optimize]
 	public Self Transpose => .(this[0,0], this[1,0], this[2,0], this[0,1], this[1,1], this[2,1], this[0,2], this[1,2], this[2,2]);
 
 	public float Determinant
 	{
-		[DisableChecks, Optimize]
 		get
 		{
 			float4 tmp = .(this[0,0], this[0,1], this[0,2], 0) * .(this[1,1], this[1,2], this[1,0], 0) * .(this[2,2], this[2,0], this[2,1], 0)
@@ -44,10 +42,8 @@ public struct Matrix3
 		}
 	}
 
-	[DisableChecks, Optimize]
 	public static Vector2 operator*(Self a, Vector2 b) => .(b.X * a[0,0] + b.Y * a[0,1] + a[0,2], b.X * a[1,0] + b.Y * a[1,1] + a[1,2]);
 
-	[DisableChecks, Optimize]
 	public static Vector3 operator*(Self a, Vector3 b)
 	{
 #if OSTEON_COLUMN_MAJOR
@@ -69,7 +65,6 @@ public struct Matrix3
 #endif
 	}
 
-	[DisableChecks, Optimize]
 	public static Self operator*(Self a, Self b)
 	{
 		Self res = ?;
