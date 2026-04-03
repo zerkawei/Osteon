@@ -5,10 +5,12 @@ namespace Osteon.Color;
 public struct Color32
 {
 	[Ordered]
-	private struct _ { public uint8 A,B,G,R; }
-
+	public struct
+	{
+		public uint8 A,B,G,R;
+	};
 	public uint32 RGBA;
-	public using private _ values;
+
 
 	public this(uint32 rgba)
 	{

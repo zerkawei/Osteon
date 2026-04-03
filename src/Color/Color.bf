@@ -1,7 +1,7 @@
 using System;
+using System.Numerics;
 namespace Osteon.Color;
 
-[UnderlyingArray(typeof(float), 4, true)]
 public struct Color
 {
 	public float R;
@@ -17,25 +17,40 @@ public struct Color
 		A = a;
 	}
 
-	[Intrinsic("add")]
-	public static extern Self operator+(Self lhs, Self rhs);
-	[Intrinsic("add"), Commutable]
-	public static extern Self operator+(Self lhs, float rhs);
+	[Inline]
+	public static Self Max(Self lhs, Self rhs) => float4.max((.)lhs, (.)rhs);
+	[Inline]
+	public static Self Min(Self lhs, Self rhs) => float4.min((.)lhs, (.)rhs);
 
-	[Intrinsic("sub")]
-	public static extern Self operator-(Self lhs, Self rhs);
-	[Intrinsic("sub"), Commutable]
-	public static extern Self operator-(Self lhs, float rhs);
+	[Inline]
+	public static Self operator+(Self lhs, Self rhs) => (float4)lhs + (float4)rhs;
+	[Inline, Commutable]
+	public static Self operator+(Self lhs, float rhs) => (float4)lhs + rhs;
 
-	[Intrinsic("mul")]
-	public static extern Self operator*(Self lhs, Self rhs);
-	[Intrinsic("mul"), Commutable]
-	public static extern Self operator*(Self lhs, float rhs);
+	[Inline]
+	public static Self operator-(Self lhs, Self rhs) => (float4)lhs - (float4)rhs;
+	[Inline]
+	public static Self operator-(Self lhs, float rhs) => (float4)lhs - rhs;
+	[Inline]
+	public static Self operator-(float lhs, Self rhs) => lhs - (float4)rhs;
 
-	[Intrinsic("div")]
-	public static extern Self operator/(Self lhs, Self rhs);
-	[Intrinsic("div")]
-	public static extern Self operator/(Self lhs, float rhs);
-	[Intrinsic("div")]
-	public static extern Self operator/(float lhs, Self rhs);
+	[Inline]
+	public static Self operator*(Self lhs, Self rhs) => (float4)lhs * (float4)rhs;
+	[Inline, Commutable]
+	public static Self operator*(Self lhs, float rhs) => (float4)lhs * rhs;
+
+	[Inline]
+	public static Self operator/(Self lhs, Self rhs) => (float4)lhs / (float4)rhs;
+	[Inline]
+	public static Self operator/(Self lhs, float rhs) => (float4)lhs / rhs;
+	[Inline]
+	public static Self operator/(float lhs, Self rhs) => lhs / (float4)rhs;
+
+	[Inline]
+	public static bool operator ==(Self lhs, Self rhs) => lhs.R == rhs.R && lhs.G == rhs.G && lhs.B == rhs.B && lhs.A == rhs.A;
+
+	[Inline]
+	public static Self operator implicit(float4 vec) => .(vec.x, vec.y, vec.z, vec.w);
+	[Inline]
+	public static float4 operator explicit(Self vec) => .(vec.R, vec.G, vec.B, vec.A);
 }
