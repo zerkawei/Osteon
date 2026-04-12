@@ -77,7 +77,7 @@ public struct Point2D
 	public static Self operator*(Self lhs, int32 rhs) => .(lhs.X * rhs, lhs.Y * rhs);
 
 	[Inline]
-	public static Self operator/(Self lhs, Self rhs) => .(lhs.X / rhs.X, lhs.Y + rhs.Y);
+	public static Self operator/(Self lhs, Self rhs) => .(lhs.X / rhs.X, lhs.Y / rhs.Y);
 	[Inline]
 	public static Self operator/(Self lhs, int32 rhs) => .(lhs.X / rhs, lhs.Y / rhs);
 	[Inline]
